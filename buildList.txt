@@ -1,0 +1,38 @@
+926, DLL, 0x802C8A00, 0x0, src/dll/prim.c src/dll/math.c src/dll/input.c src/dll/freecam.c src/dll/debug.c src/dll/oxide.c src/dll/reserves.c src/dll/settings.c src/dll/race.c, DLL.BIN
+
+926, exe, 0x800844E4, 0x0, src/hooks/exe/pause_menu.c
+926, 230, 0x800ab9f0, 0x8AF4, src/hooks/ovl230/menu_rows.c
+926, 224, 0x8009f6fc, 0xD38, src/hooks/ovl224/race_end_rows_save.c
+926, 224, 0x8009f6fc, 0xD5C, src/hooks/ovl224/race_end_menu.c
+926, 224, 0x8009f6fc, 0xD88, src/hooks/ovl224/race_end_rows_plain.c
+
+926, exe, 0x800150c0, 0x0, src/patches/nop.bin
+926, exe, 0x800277c8, 0x0, src/patches/nop.bin
+926, exe, 0x800277d0, 0x0, src/patches/nop.bin
+926, exe, 0x800277f0, 0x0, src/patches/kill_thread.s
+926, exe, 0x8001af3c, 0x0, src/patches/intro_cam.s
+
+common, exe, LOAD_Callback_Overlay_231, -0x8, src/patches/hook_callback230.s
+
+926, 226, 0x800a0f18, 0x0, src/patches/lod0.s
+926, 226, 0x800a1e80, 0x0, src/patches/lod1.s
+926, 226, 0x800a36d8, 0x0, src/patches/lod2.s
+926, 226, 0x800a4fd0, 0x0, src/patches/lod3.s
+926, 226, 0x800a6f70, 0x0, src/patches/lod4.s
+926, 226, 0x800a8b90, 0x0, src/patches/lod5.s
+926, 226, 0x800ab460, 0x0, src/patches/high_lod.s
+
+common, 230, MM_MenuProc_Main, 0x0, src/hooks/ovl230/main_menu.c
+common, 230, MM_TrackSelect_MenuProc, 0x0, src/hooks/ovl230/track_select.c
+common, 230, MM_Characters_GetModelByName, 0x0, src/hooks/ovl230/character_search.c
+
+common, 230, MM_EndOfFile, 0x0, src/hooks/ovl230/oxide_model.c
+
+common, exe, main, 0x0, src/hooks/exe/ctr_main.c
+common, exe, LOAD_TenStages, 0x0, src/hooks/exe/load_stages.c
+common, exe, LOAD_DriverMPK, 0x0, src/hooks/exe/driver_pack.c
+common, exe, VehBirth_GetModelByName, 0x0, src/hooks/exe/model_search.c
+common, exe, MainDB_GetClipSize, 0x0, src/hooks/exe/clip_buffer.c
+common, exe, MEMCARD_Save, 0x0, src/hooks/exe/memcard_save.c
+
+common, exe, rdata_free, 0x0, src/rom/boot.c src/rom/drivers.c src/rom/game_mode.c src/rom/hot_reload.c, rom_core

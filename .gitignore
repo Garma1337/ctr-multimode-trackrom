@@ -1,0 +1,7 @@
+.idea/
+backup/
+debug/
+output/
+Makefile
+overlay.ld
+nop.bin
