@@ -6,6 +6,7 @@
 #define VRAM_CHAIN_MARKER 0x20
 
 static int stagedTrack = 0;
+static int levelUnpacked = 0;
 
 static void HotReload_UploadVramChain(int* buffer)
 {
@@ -44,6 +45,8 @@ void HotReload_ApplyStagedLevel()
 	int* pointerMap = (int*)(level + *mapOffset);
 
 	LOAD_RunPtrMap(level, pointerMap + 1, *pointerMap >> 2);
+
+	levelUnpacked = 0;
 }
 
 void HotReload_Poll()
@@ -90,4 +93,24 @@ void HotReload_Poll()
 int HotReload_HasStagedTrack()
 {
 	return stagedTrack;
+}
+
+void HotReload_MarkLevelUnpacked()
+{
+	if ((sdata->gGT->levelID == CUSTOM_LEVEL_ID) && stagedTrack)
+	{
+		levelUnpacked = 1;
+	}
+}
+
+void HotReload_RepackLevel()
+{
+	volatile int* trigger = TRIGGER_HOT_RELOAD;
+
+	if (levelUnpacked && (*trigger == HOT_RELOAD_DONE))
+	{
+		LevInstDef_RePack(sdata->gGT->level1->ptr_mesh_info, 0);
+	}
+
+	levelUnpacked = 0;
 }

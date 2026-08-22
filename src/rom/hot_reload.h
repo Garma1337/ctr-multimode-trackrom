@@ -7,5 +7,7 @@ void HotReload_Poll();
 int HotReload_HasStagedTrack();
 void HotReload_UploadVram();
 void HotReload_ApplyStagedLevel();
+void HotReload_MarkLevelUnpacked();
+void HotReload_RepackLevel();
 
 #endif

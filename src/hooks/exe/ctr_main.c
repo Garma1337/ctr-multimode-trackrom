@@ -66,6 +66,7 @@ static void OnLoadingEnd()
 	DropRain_Reset(gGT);
 	GAMEPROG_GetPtrHighScoreTrack();
 	MainInit_FinalizeInit(gGT);
+	HotReload_MarkLevelUnpacked();
 	GAMEPAD_GetNumConnected(gGS);
 	sdata->boolSoundPaused = 0;
 	VehBirth_EngineAudio_AllPlayers();
@@ -164,6 +165,7 @@ static int AdvanceLoading(struct GameTracker* gGT)
 			gGT->gameMode1 = (gGT->gameMode1 | addConfig0) & ~remConfig0;
 			gGT->gameMode2 = (gGT->gameMode2 | addConfig8) & ~remConfig8;
 
+			HotReload_RepackLevel();
 			MainRaceTrack_StartLoad(sdata->Loading.Lev_ID_To_Load);
 		}
 		else if (RaceFlag_IsFullyOffScreen() == 1)
