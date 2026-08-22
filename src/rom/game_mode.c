@@ -1,3 +1,5 @@
+#include "dll/boss.h"
+#include "dll/hot_reload.h"
 #include "dll/settings.h"
 #include "game_mode.h"
 #include "rom.h"
@@ -9,18 +11,27 @@
 	(BATTLE_MODE | TIME_TRIAL | ARCADE_MODE | RELIC_RACE | CRYSTAL_CHALLENGE | \
 	 ADVENTURE_MODE | ADVENTURE_ARENA | ADVENTURE_CUP | ADVENTURE_BOSS)
 
-#define MODE_FLAGS2 (CUP_ANY_KIND | TOKEN_RACE)
+#define MODE_FLAGS2 (CUP_ANY_KIND | TOKEN_RACE | SPAWN_AT_BOSS)
 
-static void EnterCharacterSelect()
+void MM_MenuProc_Difficulty(struct RectMenu* menu);
+
+static void OpenDifficultySelect(struct RectMenu* mainMenu)
 {
-	D230.MM_State = 2;
-	D230.desiredMenuIndex = 2;
+	struct RectMenu* menu = &D230.menuDifficulty;
+
+	menu->stringIndexTitle = LNG_DIFFICULTY;
+	menu->rows = &D230.rowsDifficulty[0];
+	menu->funcPtr = &MM_MenuProc_Difficulty;
+
+	mainMenu->ptrNextBox_InHierarchy = menu;
+	mainMenu->state |= DRAW_NEXT_MENU_IN_HIERARCHY;
 }
 
 void GameMode_InstallLanguageStrings()
 {
 	// cba to adjust the main menu, so I'm shortening "Crystal Challenge" to "Crystal Race"
 	sdata->lngStrings[LNG_CRYSTAL_CHALLENGE] = (char*)"CRYSTAL RACE";
+	sdata->lngStrings[LNG_BOSS_RACE] = (char*)"BOSS RACE";
 	sdata->lngStrings[LNG_SETTINGS] = (char*)"SETTINGS";
 }
 
@@ -48,8 +59,7 @@ void GameMode_Select(struct RectMenu* mainMenu)
 	case MODE_ARCADE:
 		gGT->gameMode1 |= ARCADE_MODE;
 
-		mainMenu->ptrNextBox_InHierarchy = &D230.menuDifficulty;
-		mainMenu->state |= DRAW_NEXT_MENU_IN_HIERARCHY;
+		OpenDifficultySelect(mainMenu);
 		return;
 
 	case MODE_RELIC_RACE:
@@ -69,11 +79,23 @@ void GameMode_Select(struct RectMenu* mainMenu)
 		gGT->gameMode2 |= TOKEN_RACE;
 		break;
 
+	case MODE_BOSS_RACE:
+		gGT->gameMode1 |= (ADVENTURE_MODE | ADVENTURE_BOSS);
+
+		Boss_OpenSelect(mainMenu);
+		return;
+
 	default:
 		return;
 	}
 
-	EnterCharacterSelect();
+	GameMode_EnterCharacterSelect();
+}
+
+void GameMode_EnterCharacterSelect()
+{
+	D230.MM_State = 2;
+	D230.desiredMenuIndex = 2;
 }
 
 void GameMode_CommitLevelRequest()
@@ -90,6 +112,7 @@ void GameMode_CommitLevelRequest()
 		sdata->mainMenuState = MM_STATE_TITLE;
 		gGT->gameMode1 &= ~MODE_FLAGS1;
 		gGT->gameMode2 &= ~MODE_FLAGS2;
+		sdata->Loading.OnBegin.AddBitsConfig8 &= ~SPAWN_AT_BOSS;
 		return;
 	}
 
@@ -119,7 +142,7 @@ void GameMode_ApplyStartingGrid()
 
 int GameMode_NeedsArcadePack()
 {
-	return (sdata->gGT->gameMode1 & (TIME_TRIAL | RELIC_RACE)) == 0;
+	return (sdata->gGT->gameMode1 & (TIME_TRIAL | RELIC_RACE | ADVENTURE_BOSS)) == 0;
 }
 
 unsigned GameMode_GetLevelID()

@@ -1,10 +1,11 @@
+#include "dll/boss.h"
+#include "dll/hot_reload.h"
 #include "dll/oxide.h"
 #include "dll/race.h"
 #include "dll/settings.h"
 #include "rom.h"
 #include "rom/boot.h"
 #include "rom/game_mode.h"
-#include "rom/hot_reload.h"
 
 #include <common.h>
 
@@ -31,7 +32,6 @@ u_int CTR_Main()
 	{
 		LOAD_NextQueuedFile();
 		CDSYS_XAPauseAtEnd();
-		HotReload_Poll();
 
 		switch (sdata->mainGameState)
 		{
@@ -40,6 +40,8 @@ u_int CTR_Main()
 		case STATE_RESET_STAGE: OnResetStage(); break;
 		case STATE_GAMEPLAY:    OnGameplay();   break;
 		}
+
+		HotReload_Poll();
 	} while (true);
 }
 
@@ -65,6 +67,7 @@ static void OnLoadingEnd()
 
 	DropRain_Reset(gGT);
 	GAMEPROG_GetPtrHighScoreTrack();
+	Boss_PrepareRace();
 	MainInit_FinalizeInit(gGT);
 	HotReload_MarkLevelUnpacked();
 	GAMEPAD_GetNumConnected(gGS);

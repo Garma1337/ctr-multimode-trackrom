@@ -8,7 +8,9 @@
 #define LNG_TIME_TRIAL 0x4D
 #define LNG_CRYSTAL_CHALLENGE 0xBE
 #define LNG_CTR_TOKEN 0x176
+#define LNG_BOSS_RACE 0x4C
 #define LNG_SETTINGS 0x51
+#define LNG_DIFFICULTY 0x159
 
 #define RACE_LEVEL_ID    CRASH_COVE
 #define CRYSTAL_LEVEL_ID SKULL_ROCK
@@ -20,6 +22,7 @@ typedef enum GameModeRow
 	MODE_TIME_TRIAL,
 	MODE_CRYSTAL_CHALLENGE,
 	MODE_CTR_TOKEN,
+	MODE_BOSS_RACE,
 	MODE_SETTINGS,
 	MODE_COUNT,
 } GameModeRow;
@@ -28,6 +31,7 @@ typedef enum GameModeRow
 
 void GameMode_InstallLanguageStrings();
 void GameMode_Select(struct RectMenu* mainMenu);
+void GameMode_EnterCharacterSelect();
 void GameMode_CommitLevelRequest();
 void GameMode_ApplyStartingGrid();
 int GameMode_NeedsArcadePack();

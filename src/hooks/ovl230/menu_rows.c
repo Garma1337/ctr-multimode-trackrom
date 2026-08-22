@@ -44,15 +44,24 @@ struct MenuRow NewRowsMM[MODE_COUNT + 1] =
 	{
 		.stringIndex = LNG_CTR_TOKEN,
 		.rowOnPressUp = MODE_CRYSTAL_CHALLENGE,
-		.rowOnPressDown = MODE_SETTINGS,
+		.rowOnPressDown = MODE_BOSS_RACE,
 		.rowOnPressLeft = MODE_CTR_TOKEN,
 		.rowOnPressRight = MODE_CTR_TOKEN,
+	},
+
+	[MODE_BOSS_RACE] =
+	{
+		.stringIndex = LNG_BOSS_RACE,
+		.rowOnPressUp = MODE_CTR_TOKEN,
+		.rowOnPressDown = MODE_SETTINGS,
+		.rowOnPressLeft = MODE_BOSS_RACE,
+		.rowOnPressRight = MODE_BOSS_RACE,
 	},
 
 	[MODE_SETTINGS] =
 	{
 		.stringIndex = LNG_SETTINGS,
-		.rowOnPressUp = MODE_CTR_TOKEN,
+		.rowOnPressUp = MODE_BOSS_RACE,
 		.rowOnPressDown = MODE_SETTINGS,
 		.rowOnPressLeft = MODE_SETTINGS,
 		.rowOnPressRight = MODE_SETTINGS,

@@ -1,4 +1,4 @@
-926, DLL, 0x802C8A00, 0x0, src/dll/prim.c src/dll/math.c src/dll/input.c src/dll/freecam.c src/dll/debug.c src/dll/oxide.c src/dll/reserves.c src/dll/settings.c src/dll/race.c, DLL.BIN
+926, DLL, 0x802C8A00, 0x0, src/dll/prim.c src/dll/math.c src/dll/input.c src/dll/freecam.c src/dll/debug.c src/dll/oxide.c src/dll/reserves.c src/dll/settings.c src/dll/race.c src/dll/hot_reload.c src/dll/boss.c, DLL.BIN
 
 926, exe, 0x800844E4, 0x0, src/hooks/exe/pause_menu.c
 926, 230, 0x800ab9f0, 0x8AF4, src/hooks/ovl230/menu_rows.c
@@ -35,4 +35,4 @@ common, exe, VehBirth_GetModelByName, 0x0, src/hooks/exe/model_search.c
 common, exe, MainDB_GetClipSize, 0x0, src/hooks/exe/clip_buffer.c
 common, exe, MEMCARD_Save, 0x0, src/hooks/exe/memcard_save.c
 
-common, exe, rdata_free, 0x0, src/rom/boot.c src/rom/drivers.c src/rom/game_mode.c src/rom/hot_reload.c, rom_core
+common, exe, rdata_free, 0x0, src/rom/boot.c src/rom/drivers.c src/rom/game_mode.c, rom_core

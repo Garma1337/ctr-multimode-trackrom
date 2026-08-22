@@ -1,6 +1,6 @@
+#include "dll/hot_reload.h"
 #include "rom.h"
 #include "rom/game_mode.h"
-#include "rom/hot_reload.h"
 
 #include <common.h>
 

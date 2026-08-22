@@ -1,3 +1,4 @@
+#include "dll/boss.h"
 #include "drivers.h"
 #include "game_mode.h"
 #include "rom.h"
@@ -64,6 +65,14 @@ void Drivers_QueueModePack(struct BigHeader* bigfile, void* callback)
 	if (sdata->gGT->gameMode1 & MAIN_MENU)
 	{
 		LOAD_AppendQueue((int)bigfile, LT_DRAM, BI_ADVENTUREPACK, NULL, callback);
+		return;
+	}
+
+	if (Boss_IsRace())
+	{
+		Boss_ApplyDrivers();
+
+		LOAD_AppendQueue((int)bigfile, LT_DRAM, BI_TIMETRIALPACK + data.characterIDs[1], NULL, callback);
 		return;
 	}
 

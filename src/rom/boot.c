@@ -1,4 +1,5 @@
 #include "boot.h"
+#include "dll/boss.h"
 #include "dll/oxide.h"
 #include "dll/settings.h"
 #include "drivers.h"
@@ -138,6 +139,8 @@ void Boot_Run()
 
 	int dllSize;
 	LOAD_XnfFile(DLL_PATH, DLL_ADDR, &dllSize);
+
+	Boss_InstallRows();
 	Oxide_ScaleRaceModel();
 	Settings_ApplyCodePatches();
 }
