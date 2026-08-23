@@ -457,14 +457,13 @@ void Settings_PollHost(void)
 	hostSequence = host->sequence;
 	hostSeen = 1;
 
-	Config next = *Config_Get();
+	Config next;
+	memcpy(&next, (const void*)&host->config, sizeof(next));
 
-	next.relicSapphire = host->relicSapphire;
-	next.relicGold = host->relicGold;
-	next.relicPlatinum = host->relicPlatinum;
-	next.crystalTime = host->crystalTime;
-	next.introCutscene = (host->introCutscene != 0);
-	next.ghosts = (host->ghost != 0);
+	if (!Config_IsValid(&next))
+	{
+		return;
+	}
 
 	Config_Set(&next);
 

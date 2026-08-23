@@ -21,31 +21,31 @@ Once a track has been pushed, every mode runs on it instead of the built-in fall
 
 ## Pushing settings
 
-Write `HostSettings` at `0x8000C080`, little-endian, 4 bytes per field:
+Write `HostSettings` at `0x8000C080`, little-endian:
 
-| Offset | Field           |                                             |
-|--------|-----------------|---------------------------------------------|
-| `0x00` | `magic`         | `0x53544553` (`SETS`)                       |
-| `0x04` | `sequence`      | change this on every push                   |
-| `0x08` | `relicSapphire` | milliseconds                                |
-| `0x0C` | `relicGold`     | milliseconds                                |
-| `0x10` | `relicPlatinum` | milliseconds                                |
-| `0x14` | `crystalTime`   | milliseconds                                |
-| `0x18` | `introCutscene` | 1 plays the race intro camera, 0 skips it   |
-| `0x1C` | `ghost`         | 1 leaves the ghost replay alone, 0 stops it |
+| Offset | Field      |                                                    |
+|--------|------------|----------------------------------------------------|
+| `0x00` | `magic`    | `0x53544553` (`SETS`)                              |
+| `0x04` | `sequence` | change this on every push                          |
+| `0x08` | `config`   | a complete `Config`, laid out by `config_schema.h` |
 
-Milliseconds, so 1 second is `1000` and 1:17.0 is `77000`. Valid range is 500 to 599500 and anything outside it is clamped. Values that are not a multiple of 500 work, they just will not line up with the panel's half-second steps.
+The payload is the same struct `CONFIG.BIN` holds, so **anything that can be baked can be pushed**: relic and crystal times, lap count, token color, every feature flag, which modes appear, which bosses appear, and the `editable` mask. There is no second list of pushable fields to keep in step — include `src/config_schema.h` on the editor side and fill it in.
+
+Times are milliseconds, so 1 second is `1000` and 1:17.0 is `77000`. Valid range is 500 to 599500 and anything outside it is clamped. Values that are not a multiple of 500 work, they just will not line up with the panel's half-second steps.
+
+Fill in the config's own `magic`, `version` and `size` as well as the outer ones. The ROM ignores a push whose config fails the same validation `CONFIG.BIN` gets, so a stale or half-written block cannot be applied.
 
 **Write the payload first and `sequence` last.** The ROM latches on `sequence` changing, so writing it early lets a half-finished block be read.
 
-Two things to get right:
+Three things to get right:
 
+- **A push replaces the whole config**, not just the fields you care about. Sending a default-constructed struct silently resets modes, features and the editable mask. Seed it from the ROM's `CONFIG.BIN` — which the editor can read out of the ISO it is working with — and change what you need.
 - **`sequence` must differ from the previous push, including across editor restarts.** The ROM only compares for inequality, so wrap-around and resets are fine — but a counter starting at 0 on every launch will have its first push ignored if the ROM last saw 0. Seed it from a timestamp or persist it.
-- **Send the fields as signed 32-bit.** A value with the top bit set reads as negative and clamps to the *minimum*, which looks like "the push never arrived" rather than an obvious error.
+- **Send the time fields as signed 32-bit.** A value with the top bit set reads as negative and clamps to the *minimum*, which looks like "the push never arrived" rather than an obvious error.
 
-A push overrides whatever is in the panel. Panel edits made afterwards stick until the next push, and if the panel is open when a push arrives it updates to show the new values. Relic times are written into the level's slot as the race loads, which includes hot-reloaded tracks.
+A push overrides whatever is in the panel and takes effect immediately — toggling a mode off rebuilds the main menu, changing the ghost setting re-patches the code. Panel edits made afterwards stick until the next push, and if the panel is open when a push arrives it updates to show the new values. Relic times are written into the level's slot as the race loads, which includes hot-reloaded tracks.
 
-`HostSettings` covers six of the ROM's settings. The rest — modes, bosses, features, lap count, token color — are not pushable and are set in the config; see [Customization](./customization.md).
+Nothing is written back to disc, so a push only lasts the session.
 
 ## Ghost export
 

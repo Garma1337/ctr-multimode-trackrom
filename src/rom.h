@@ -1,6 +1,8 @@
 #ifndef ROM_H
 #define ROM_H
 
+#include "config_schema.h"
+
 #include <common.h>
 
 #define CUSTOM_LEVEL_ID 0
@@ -17,17 +19,12 @@
 
 typedef struct HostSettings
 {
-	int magic;          // HOST_SETTINGS_MAGIC once the editor has written here
-	int sequence;       // bumped by the editor on every push
-	int relicSapphire;  // ms
-	int relicGold;      // ms
-	int relicPlatinum;  // ms
-	int crystalTime;    // ms
-	int introCutscene;  // 1 plays the start-line fly-in, 0 skips it
-	int ghost;          // 1 leaves the ghost replay alone, 0 kills its thread
+	int magic;      // HOST_SETTINGS_MAGIC once the editor has written here
+	int sequence;   // changed by the editor on every push
+	Config config;
 } HostSettings;
 
-_Static_assert(sizeof(HostSettings) == 32, "HostSettings layout changed; update the editor side too");
+_Static_assert(sizeof(HostSettings) == (8 + sizeof(Config)), "HostSettings layout changed; update the editor side too");
 
 typedef enum HotReloadStep
 {

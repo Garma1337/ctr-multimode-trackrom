@@ -133,6 +133,11 @@ void Config_Set(const Config* next)
 	Config_Refresh();
 }
 
+int Config_IsValid(const Config* candidate)
+{
+	return Config_Validate(candidate) == CONFIG_OK;
+}
+
 const Config* Config_Get()
 {
 	return &config;

@@ -12,6 +12,8 @@ Everything this ROM lets you change lives in one struct. There are three places 
 
 Live edits apply immediately — changing a mode toggle rebuilds the menu, changing the ghost setting re-patches the code — but they are not written back to disc. To ship settings you edit `src/config_default.h` and rebuild.
 
+An editor push carries the same complete `Config`, so everything on this page can be set live as well as baked — see [CrashTeamEditor interface](./cte-interface.md).
+
 ## What can be configured
 
 The settings panel shows one row per field. It scrolls; twelve rows are visible at a time.
@@ -35,7 +37,7 @@ The three relic times are the targets for Relic Race; the defaults are Crash Cov
 
 **CTR Token Color** exists because a custom track uses Dingo Canyon's level slot and inherits its metadata, which is where the token takes its color from. Without this the token is always yellow.
 
-**Intro Cutscene** off skips the race intro camera fly-in, which saves a few seconds on every retry. 
+**Intro Cutscene** off skips the race intro camera fly-in, which saves a few seconds on every retry.
 
 **Time Trial Ghosts** off stops the N. Tropy / Oxide ghost replay from running. Both are applied by patching instructions, so they take effect on the next race.
 
@@ -50,7 +52,7 @@ The three relic times are the targets for Relic Race; the defaults are Crash Cov
 | Host Settings        | the ROM stops listening for editor settings pushes   |
 | Updated Engine Stats | characters keep their vanilla speed and acceleration |
 
-Hot Reload and Host Settings are the only two that are editor-side; a shipped ROM has no reason to keep polling for them. See [Features](features.md) for what Updated Engine Stats actually changes.
+Hot Reload and Host Settings are the only two that are editor-side; a shipped ROM has no reason to keep polling for them. See [Features](./features.md) for what Updated Engine Stats actually changes.
 
 ### Modes and bosses
 
