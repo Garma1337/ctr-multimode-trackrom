@@ -17,7 +17,7 @@
 
 void MainMenu_Reset();
 void MainMenu_AddEntry(int id, short stringIndex);
-struct MenuRow* MainMenu_GetRows();
+void MainMenu_Attach(struct RectMenu* mainMenu);
 int MainMenu_GetEntryId(int row);
 
 void MainMenu_InstallStrings();

@@ -1,5 +1,6 @@
 #include "boot.h"
 #include "dll/boss.h"
+#include "dll/config.h"
 #include "dll/main_menu.h"
 #include "dll/oxide.h"
 #include "dll/settings.h"
@@ -140,8 +141,6 @@ void Boot_Run()
 	LOAD_XnfFile(DLL_PATH, DLL_ADDR, &dllSize);
 
 	MainMenu_InstallStrings();
-	Boss_InstallRows();
-	MainMenu_Build();
+	Config_Load();
 	Oxide_ScaleRaceModel();
-	Settings_ApplyCodePatches();
 }

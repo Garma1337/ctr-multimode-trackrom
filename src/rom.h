@@ -61,6 +61,12 @@ typedef enum HotReloadStep
 
 _Static_assert(DLL_LOCATION == 0x802C8A00, "DLL_LOCATION must match the DLL line in buildList.txt");
 
+#define CONFIG_LOCATION     0x802F0000
+#define CONFIG_ADDR         (char*) CONFIG_LOCATION
+#define CONFIG_PATH         "\\CONFIG.BIN;1"
+
+_Static_assert(CONFIG_LOCATION > DLL_LOCATION, "CONFIG must sit above the DLL");
+
 // sdata->mainGameState
 typedef enum MainState
 {

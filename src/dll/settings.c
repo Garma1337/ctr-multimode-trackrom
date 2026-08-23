@@ -1,3 +1,4 @@
+#include "config.h"
 #include "input.h"
 #include "math.h"
 #include "prim.h"
@@ -6,20 +7,17 @@
 
 #include <common.h>
 
-#define STEP_FINE     SECONDS(0.5)
-#define STEP_COARSE   SECONDS(5)
-#define TIME_MIN      SECONDS(0.5)
-#define TIME_MAX      SECONDS(599.5)
-#define TIME_MIN_MS   500
-#define TIME_MAX_MS   599500
+#define STEP_FINE_MS   500
+#define STEP_COARSE_MS 5000
+#define TIME_MIN_MS    500
+#define TIME_MAX_MS    599500
 
-#define DEFAULT_SAPPHIRE  SECONDS(77)
-#define DEFAULT_GOLD      SECONDS(65)
-#define DEFAULT_PLATINUM  SECONDS(52)
-#define DEFAULT_CRYSTAL   SECONDS(120)
+#define LAPS_STEP 2
 
 #define REPEAT_DELAY_FRAMES  15
 #define REPEAT_RATE_FRAMES   3
+
+#define VISIBLE_ROWS   12
 
 #define PANEL_PAD_X    10
 #define PANEL_PAD_Y    7
@@ -56,6 +54,7 @@
 typedef enum FieldKind
 {
 	FIELD_TIME = 0,
+	FIELD_LAPS,
 	FIELD_TOGGLE
 } FieldKind;
 
@@ -64,138 +63,202 @@ static const char* const fieldLabels[SETTINGS_FIELD_COUNT] = {
 	"Relic - Gold",
 	"Relic - Platinum",
 	"Crystal Time Limit",
+	"Laps",
 	"Intro Cutscene",
 	"Time Trial Ghosts",
+
+	"Freecam",
+	"Debug HUD",
+	"Reserves Display",
+	"Hot Reload",
+	"Host Settings",
+
+	"Mode - Arcade",
+	"Mode - Relic Race",
+	"Mode - Time Trial",
+	"Mode - Crystal Race",
+	"Mode - CTR Token",
+	"Mode - Boss Race",
+
+	"Boss - Ripper Roo",
+	"Boss - Papu Papu",
+	"Boss - Komodo Joe",
+	"Boss - Pinstripe",
+	"Boss - N. Oxide",
 };
 
-static const unsigned char fieldKinds[SETTINGS_FIELD_COUNT] = {
+static const unsigned char fieldKinds[SETTINGS_FEATURE_FIRST] = {
 	FIELD_TIME,
 	FIELD_TIME,
 	FIELD_TIME,
 	FIELD_TIME,
+	FIELD_LAPS,
 	FIELD_TOGGLE,
 	FIELD_TOGGLE,
-};
-
-static int values[SETTINGS_FIELD_COUNT] = {
-	DEFAULT_SAPPHIRE,
-	DEFAULT_GOLD,
-	DEFAULT_PLATINUM,
-	DEFAULT_CRYSTAL,
-	1,
-	1,
 };
 
 static int isOpen = 0;
 static int cursor = 0;
+static int scroll = 0;
 static int repeatTimer = 0;
 static int closing = 0;
 static struct RectMenu* savedMenu = 0;
 static int draft[SETTINGS_FIELD_COUNT];
+static unsigned char visibleField[SETTINGS_FIELD_COUNT];
+static int visibleCount = 0;
 static int commitOnClose = 0;
 static int hostSequence = 0;
 static int hostSeen = 0;
 
-static void Settings_FormatTime(char* out, int ticks)
+static int Settings_GetKind(int field)
 {
-	int tenths = (ticks * 10) / SECOND;
+	return (field < SETTINGS_FEATURE_FIRST) ? fieldKinds[field] : FIELD_TOGGLE;
+}
+
+static int Settings_GetCursorField(void)
+{
+	return visibleField[cursor];
+}
+
+static int Settings_CalculateTicksFromMs(int ms)
+{
+	return (Math_Clamp(ms, TIME_MIN_MS, TIME_MAX_MS) * SECOND) / 1000;
+}
+
+static void Settings_FormatTime(char* out, int ms)
+{
+	int tenths = ms / 100;
 
 	sprintf(out, "%d:%02d.%d", tenths / 600, (tenths / 10) % 60, tenths % 10);
 }
 
 static void Settings_FormatValue(char* out, int field)
 {
-	if (fieldKinds[field] == FIELD_TOGGLE)
+	switch (Settings_GetKind(field))
 	{
+	case FIELD_TIME:
+		Settings_FormatTime(out, draft[field]);
+		return;
+
+	case FIELD_LAPS:
+		sprintf(out, "%d", draft[field]);
+		return;
+
+	case FIELD_TOGGLE:
 		sprintf(out, "%s", draft[field] ? "On" : "Off");
 		return;
 	}
+}
 
-	Settings_FormatTime(out, draft[field]);
+static void Settings_UnpackBits(unsigned int bits, int first, int end)
+{
+	for (int i = first; i < end; i++)
+	{
+		draft[i] = (bits & (1 << (i - first))) != 0;
+	}
+}
+
+static unsigned int Settings_PackBits(int first, int end)
+{
+	unsigned int bits = 0;
+
+	for (int i = first; i < end; i++)
+	{
+		if (draft[i])
+		{
+			bits |= 1 << (i - first);
+		}
+	}
+
+	return bits;
 }
 
 static void Settings_LoadDraft(void)
 {
-	for (int i = 0; i < SETTINGS_FIELD_COUNT; i++)
-	{
-		draft[i] = values[i];
-	}
+	const Config* config = Config_Get();
+
+	draft[SETTINGS_RELIC_SAPPHIRE] = config->relicSapphire;
+	draft[SETTINGS_RELIC_GOLD] = config->relicGold;
+	draft[SETTINGS_RELIC_PLATINUM] = config->relicPlatinum;
+	draft[SETTINGS_CRYSTAL_TIME] = config->crystalTime;
+	draft[SETTINGS_LAPS] = config->laps;
+	draft[SETTINGS_INTRO_CUTSCENE] = (config->introCutscene != 0);
+	draft[SETTINGS_GHOST] = (config->ghosts != 0);
+
+	Settings_UnpackBits(config->features, SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
+	Settings_UnpackBits(config->modes, SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
+	Settings_UnpackBits(config->bosses, SETTINGS_BOSS_FIRST, SETTINGS_BOSS_END);
 }
 
 static void Settings_Commit(void)
 {
-	for (int i = 0; i < SETTINGS_FIELD_COUNT; i++)
-	{
-		values[i] = draft[i];
-	}
+	Config next = *Config_Get();
 
-	Settings_ApplyCodePatches();
+	next.relicSapphire = draft[SETTINGS_RELIC_SAPPHIRE];
+	next.relicGold = draft[SETTINGS_RELIC_GOLD];
+	next.relicPlatinum = draft[SETTINGS_RELIC_PLATINUM];
+	next.crystalTime = draft[SETTINGS_CRYSTAL_TIME];
+	next.laps = (unsigned char)draft[SETTINGS_LAPS];
+	next.introCutscene = (unsigned char)draft[SETTINGS_INTRO_CUTSCENE];
+	next.ghosts = (unsigned char)draft[SETTINGS_GHOST];
+
+	next.features = Settings_PackBits(SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
+	next.modes = Settings_PackBits(SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
+	next.bosses = (unsigned char)Settings_PackBits(SETTINGS_BOSS_FIRST, SETTINGS_BOSS_END);
+
+	Config_Set(&next);
 }
 
-static int Settings_ClampTime(int ticks)
+static void Settings_BuildVisibleFields(void)
 {
-	return Math_Clamp(ticks, TIME_MIN, TIME_MAX);
-}
+	unsigned int editable = Config_Get()->editable;
 
-static int Settings_TicksFromMs(int ms)
-{
-	ms = Math_Clamp(ms, TIME_MIN_MS, TIME_MAX_MS);
+	visibleCount = 0;
 
-	return Settings_ClampTime((ms * SECOND) / 1000);
-}
-
-void Settings_PollHost(void)
-{
-	volatile HostSettings* host = HOST_SETTINGS;
-
-	if (host->magic != HOST_SETTINGS_MAGIC)
+	for (int field = 0; field < SETTINGS_FIELD_COUNT; field++)
 	{
-		return;
-	}
-
-	if (hostSeen && host->sequence == hostSequence)
-	{
-		return;
-	}
-
-	hostSequence = host->sequence;
-	hostSeen = 1;
-
-	values[SETTINGS_RELIC_SAPPHIRE] = Settings_TicksFromMs(host->relicSapphire);
-	values[SETTINGS_RELIC_GOLD] = Settings_TicksFromMs(host->relicGold);
-	values[SETTINGS_RELIC_PLATINUM] = Settings_TicksFromMs(host->relicPlatinum);
-	values[SETTINGS_CRYSTAL_TIME] = Settings_TicksFromMs(host->crystalTime);
-	values[SETTINGS_INTRO_CUTSCENE] = (host->introCutscene != 0);
-	values[SETTINGS_GHOST] = (host->ghost != 0);
-
-	Settings_ApplyCodePatches();
-
-	if (isOpen)
-	{
-		Settings_LoadDraft();
+		if ((editable & (1 << field)) != 0)
+		{
+			visibleField[visibleCount++] = (unsigned char)field;
+		}
 	}
 }
 
-void Settings_ApplyCodePatches(void)
+static void Settings_ScrollToCursor(void)
 {
-	*INTRO_CAM_AT = values[SETTINGS_INTRO_CUTSCENE] ? INTRO_CAM_STOCK : INTRO_CAM_SKIP;
-	*GHOST_THREAD_AT = values[SETTINGS_GHOST] ? GHOST_STOCK : GHOST_KILL;
+	if (cursor < scroll)
+	{
+		scroll = cursor;
+	}
 
-	FlushCache();
+	if (cursor >= (scroll + VISIBLE_ROWS))
+	{
+		scroll = cursor - VISIBLE_ROWS + 1;
+	}
 }
 
 static void Settings_Adjust(int delta)
 {
-	if (fieldKinds[cursor] == FIELD_TOGGLE)
+	int field = Settings_GetCursorField();
+
+	switch (Settings_GetKind(field))
 	{
-		draft[cursor] = !draft[cursor];
+	case FIELD_TIME:
+		draft[field] = Math_Clamp(draft[field] + delta, TIME_MIN_MS, TIME_MAX_MS);
+		return;
+
+	case FIELD_LAPS:
+		draft[field] = Math_Clamp(draft[field] + ((delta > 0) ? LAPS_STEP : -LAPS_STEP),
+			CONFIG_LAPS_MIN, CONFIG_LAPS_MAX) | 1;
+		return;
+
+	case FIELD_TOGGLE:
+		draft[field] = !draft[field];
 		return;
 	}
-
-	draft[cursor] = Settings_ClampTime(draft[cursor] + delta);
 }
 
-static int Settings_Repeated(int buttonMask)
+static int Settings_IsRepeatedButtonPress(int buttonMask)
 {
 	if (Input_IsTapped(buttonMask))
 	{
@@ -212,7 +275,7 @@ static int Settings_Repeated(int buttonMask)
 
 static void Settings_ApplyStep(int buttonMask, int delta)
 {
-	int fired = (fieldKinds[cursor] == FIELD_TOGGLE) ? Input_IsTapped(buttonMask) : Settings_Repeated(buttonMask);
+	int fired = (Settings_GetKind(Settings_GetCursorField()) == FIELD_TIME) ? Settings_IsRepeatedButtonPress(buttonMask) : Input_IsTapped(buttonMask);
 
 	if (!fired)
 	{
@@ -241,29 +304,31 @@ static void Settings_HandleInput(void)
 
 	if (Input_IsTapped(INPUT_SETTINGS_UP))
 	{
-		cursor = Math_Wrap(cursor - 1, SETTINGS_FIELD_COUNT);
+		cursor = Math_Wrap(cursor - 1, visibleCount);
+		Settings_ScrollToCursor();
 		OtherFX_Play(SFX_CURSOR, 1);
 	}
 
 	if (Input_IsTapped(INPUT_SETTINGS_DOWN))
 	{
-		cursor = Math_Wrap(cursor + 1, SETTINGS_FIELD_COUNT);
+		cursor = Math_Wrap(cursor + 1, visibleCount);
+		Settings_ScrollToCursor();
 		OtherFX_Play(SFX_CURSOR, 1);
 	}
 
-	Settings_ApplyStep(INPUT_SETTINGS_DEC, -STEP_FINE);
-	Settings_ApplyStep(INPUT_SETTINGS_INC, STEP_FINE);
-	Settings_ApplyStep(INPUT_SETTINGS_DEC_FAST, -STEP_COARSE);
-	Settings_ApplyStep(INPUT_SETTINGS_INC_FAST, STEP_COARSE);
+	Settings_ApplyStep(INPUT_SETTINGS_DEC, -STEP_FINE_MS);
+	Settings_ApplyStep(INPUT_SETTINGS_INC, STEP_FINE_MS);
+	Settings_ApplyStep(INPUT_SETTINGS_DEC_FAST, -STEP_COARSE_MS);
+	Settings_ApplyStep(INPUT_SETTINGS_INC_FAST, STEP_COARSE_MS);
 }
 
-static int Settings_WidestLabel(void)
+static int Settings_CalculateWidestLabel(void)
 {
 	int widest = 0;
 
-	for (int i = 0; i < SETTINGS_FIELD_COUNT; i++)
+	for (int i = 0; i < visibleCount; i++)
 	{
-		int width = DecalFont_GetLineWidth((char*)fieldLabels[i], FONT_SMALL);
+		int width = DecalFont_GetLineWidth((char*)fieldLabels[visibleField[i]], FONT_SMALL);
 
 		if (width > widest)
 		{
@@ -278,7 +343,9 @@ static void Settings_Draw(struct GameTracker* gGT)
 {
 	u_long* ot = &gGT->pushBuffer_UI.ptrOT[0];
 
-	int labelWidth = Settings_WidestLabel();
+	int rowsShown = (visibleCount < VISIBLE_ROWS) ? visibleCount : VISIBLE_ROWS;
+
+	int labelWidth = Settings_CalculateWidestLabel();
 	int valueWidth = DecalFont_GetLineWidth(VALUE_SAMPLE, FONT_SMALL);
 	int confirmWidth = DecalFont_GetLineWidth(HINT_CONFIRM, FONT_SMALL);
 	int backWidth = DecalFont_GetLineWidth(HINT_BACK, FONT_SMALL);
@@ -298,7 +365,7 @@ static void Settings_Draw(struct GameTracker* gGT)
 	}
 
 	int panelW = content + 2 * (PANEL_PAD_X + CURSOR_GUTTER);
-	int panelH = 2 * PANEL_PAD_Y + TITLE_HEIGHT + SETTINGS_FIELD_COUNT * ROW_SPACING + HINT_LINES * HINT_HEIGHT;
+	int panelH = 2 * PANEL_PAD_Y + TITLE_HEIGHT + rowsShown * ROW_SPACING + HINT_LINES * HINT_HEIGHT;
 
 	panelW = Math_Clamp(panelW, 0, SCREEN_WIDTH);
 
@@ -311,16 +378,17 @@ static void Settings_Draw(struct GameTracker* gGT)
 
 	DecalFont_DrawLineOT("SETTINGS", panelX + panelW / 2, panelY + PANEL_PAD_Y, FONT_BIG, COLOR_TITLE | JUSTIFY_CENTER, ot);
 
-	for (int i = 0; i < SETTINGS_FIELD_COUNT; i++)
+	for (int i = 0; i < rowsShown; i++)
 	{
+		int slot = scroll + i;
+		int field = visibleField[slot];
 		int y = rowY + i * ROW_SPACING;
-		int active = (i == cursor);
-		int color = active ? COLOR_ACTIVE : COLOR_ROW;
+		int color = (slot == cursor) ? COLOR_ACTIVE : COLOR_ROW;
 
 		char value[16];
-		Settings_FormatValue(value, i);
+		Settings_FormatValue(value, field);
 
-		DecalFont_DrawLineOT((char*)fieldLabels[i], labelX, y, FONT_SMALL, color, ot);
+		DecalFont_DrawLineOT((char*)fieldLabels[field], labelX, y, FONT_SMALL, color, ot);
 		DecalFont_DrawLineOT(value, valueX, y, FONT_SMALL, color | JUSTIFY_RIGHT, ot);
 	}
 
@@ -331,6 +399,50 @@ static void Settings_Draw(struct GameTracker* gGT)
 	Prim_DrawShadowedBox(panelX, panelY, panelW, panelH, ot, &gGT->backBuffer->primMem);
 }
 
+void Settings_ApplyCodePatches(void)
+{
+	const Config* config = Config_Get();
+
+	*INTRO_CAM_AT = config->introCutscene ? INTRO_CAM_STOCK : INTRO_CAM_SKIP;
+	*GHOST_THREAD_AT = config->ghosts ? GHOST_STOCK : GHOST_KILL;
+
+	FlushCache();
+}
+
+void Settings_PollHost(void)
+{
+	volatile HostSettings* host = HOST_SETTINGS;
+
+	if (host->magic != HOST_SETTINGS_MAGIC)
+	{
+		return;
+	}
+
+	if (hostSeen && host->sequence == hostSequence)
+	{
+		return;
+	}
+
+	hostSequence = host->sequence;
+	hostSeen = 1;
+
+	Config next = *Config_Get();
+
+	next.relicSapphire = host->relicSapphire;
+	next.relicGold = host->relicGold;
+	next.relicPlatinum = host->relicPlatinum;
+	next.crystalTime = host->crystalTime;
+	next.introCutscene = (host->introCutscene != 0);
+	next.ghosts = (host->ghost != 0);
+
+	Config_Set(&next);
+
+	if (isOpen)
+	{
+		Settings_LoadDraft();
+	}
+}
+
 void Settings_Open(struct RectMenu* mainMenu)
 {
 	if (isOpen)
@@ -338,8 +450,17 @@ void Settings_Open(struct RectMenu* mainMenu)
 		return;
 	}
 
+	Settings_BuildVisibleFields();
+
+	if (visibleCount == 0)
+	{
+		return;
+	}
+
 	Settings_LoadDraft();
 
+	cursor = 0;
+	scroll = 0;
 	savedMenu = mainMenu;
 	isOpen = 1;
 	closing = 0;
@@ -421,15 +542,27 @@ void Settings_Update(void)
 
 int Settings_GetRelicTime(int tier)
 {
-	if (tier < 0 || tier >= SETTINGS_RELIC_TIERS)
+	const Config* config = Config_Get();
+
+	if (tier == 1)
 	{
-		return values[SETTINGS_RELIC_SAPPHIRE];
+		return Settings_CalculateTicksFromMs(config->relicGold);
 	}
 
-	return values[SETTINGS_RELIC_SAPPHIRE + tier];
+	if (tier == 2)
+	{
+		return Settings_CalculateTicksFromMs(config->relicPlatinum);
+	}
+
+	return Settings_CalculateTicksFromMs(config->relicSapphire);
 }
 
 int Settings_GetCrystalTime(void)
 {
-	return values[SETTINGS_CRYSTAL_TIME];
+	return Settings_CalculateTicksFromMs(Config_Get()->crystalTime);
+}
+
+int Settings_IsAvailable(void)
+{
+	return Config_Get()->editable != 0;
 }

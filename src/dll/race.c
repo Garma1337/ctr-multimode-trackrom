@@ -1,3 +1,4 @@
+#include "config.h"
 #include "debug.h"
 #include "freecam.h"
 #include "input.h"
@@ -96,12 +97,15 @@ void Race_Update(struct GameTracker* gGT)
 
 	Debug_Sample();
 
-	if (Input_IsTapped(INPUT_DEBUG_HUD_TOGGLE))
+	if (Config_IsFeatureEnabled(FEATURE_DEBUG_HUD) && Input_IsTapped(INPUT_DEBUG_HUD_TOGGLE))
 	{
 		Debug_Toggle();
 	}
 
-	Freecam_CheckToggle();
+	if (Config_IsFeatureEnabled(FEATURE_FREECAM))
+	{
+		Freecam_CheckToggle();
+	}
 
 	if (Freecam_IsActive())
 	{
@@ -129,7 +133,10 @@ void Race_Update(struct GameTracker* gGT)
 		return;
 	}
 
-	Reserves_Draw(gGT);
+	if (Config_IsFeatureEnabled(FEATURE_RESERVES))
+	{
+		Reserves_Draw(gGT);
+	}
 }
 
 void Race_RunRenderFrame(struct GameTracker* gGT, struct GamepadSystem* gGS)

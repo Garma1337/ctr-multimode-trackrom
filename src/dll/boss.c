@@ -1,6 +1,7 @@
 #include "boss.h"
-#include "rom.h"
+#include "config.h"
 #include "main_menu.h"
+#include "rom.h"
 
 #include <common.h>
 
@@ -10,6 +11,8 @@
 
 static struct MetaDataBOSS itemSets[MAX_ITEM_SETS + 1];
 static struct MenuRow bossRows[BOSS_COUNT + 1];
+static unsigned char bossRowId[BOSS_COUNT];
+static int bossRowCount;
 static int selectedBoss = BOSS_RIPPER_ROO;
 
 static const unsigned char bossCharacter[BOSS_COUNT] =
@@ -85,13 +88,13 @@ static void Boss_MenuProc(struct RectMenu* menu)
 		return;
 	}
 
-	if (row >= BOSS_COUNT)
+	if (row >= bossRowCount)
 	{
 		return;
 	}
 
-	selectedBoss = row;
-	sdata->gGT->bossID = row;
+	selectedBoss = bossRowId[row];
+	sdata->gGT->bossID = selectedBoss;
 
 	MainMenu_EnterCharacterSelect();
 
@@ -100,16 +103,33 @@ static void Boss_MenuProc(struct RectMenu* menu)
 
 void Boss_InstallRows()
 {
-	for (int i = 0; i < BOSS_COUNT; i++)
+	bossRowCount = 0;
+
+	for (int boss = 0; boss < BOSS_COUNT; boss++)
 	{
-		bossRows[i].stringIndex = data.MetaDataCharacters[bossCharacter[i]].name_LNG_long;
-		bossRows[i].rowOnPressUp = (char)((i == 0) ? 0 : (i - 1));
-		bossRows[i].rowOnPressDown = (char)((i == (BOSS_COUNT - 1)) ? i : (i + 1));
-		bossRows[i].rowOnPressLeft = (char)i;
-		bossRows[i].rowOnPressRight = (char)i;
+		if (!Config_IsBossEnabled(boss))
+		{
+			continue;
+		}
+
+		int row = bossRowCount++;
+
+		bossRowId[row] = (unsigned char)boss;
+
+		bossRows[row].stringIndex = data.MetaDataCharacters[bossCharacter[boss]].name_LNG_long;
+		bossRows[row].rowOnPressUp = (char)((row == 0) ? 0 : (row - 1));
+		bossRows[row].rowOnPressDown = (char)row;
+		bossRows[row].rowOnPressLeft = (char)row;
+		bossRows[row].rowOnPressRight = (char)row;
+
+		if (row > 0)
+		{
+			bossRows[row - 1].rowOnPressDown = (char)row;
+		}
 	}
 
-	bossRows[BOSS_COUNT].stringIndex = -1;
+	selectedBoss = bossRowId[0];
+	bossRows[bossRowCount].stringIndex = -1;
 }
 
 void Boss_OpenSelect(struct RectMenu* mainMenu)

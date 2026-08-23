@@ -1,11 +1,12 @@
 #include "dll/boss.h"
+#include "dll/config.h"
 #include "dll/hot_reload.h"
+#include "dll/level.h"
 #include "dll/oxide.h"
 #include "dll/race.h"
 #include "dll/settings.h"
 #include "rom.h"
 #include "rom/boot.h"
-#include "dll/level.h"
 
 #include <common.h>
 
@@ -41,7 +42,10 @@ u_int CTR_Main()
 		case STATE_GAMEPLAY:    OnGameplay();   break;
 		}
 
-		HotReload_Poll();
+		if (Config_IsFeatureEnabled(FEATURE_HOT_RELOAD))
+		{
+			HotReload_Poll();
+		}
 	} while (true);
 }
 
@@ -237,7 +241,11 @@ static void RunFrame(struct GameTracker* gGT, struct GamepadSystem* gGS)
 		gGT->hudFlags &= ~1;
 	}
 
-	Settings_PollHost();
+	if (Config_IsFeatureEnabled(FEATURE_HOST_SETTINGS))
+	{
+		Settings_PollHost();
+	}
+
 	Race_Update(gGT);
 	Settings_Update();
 

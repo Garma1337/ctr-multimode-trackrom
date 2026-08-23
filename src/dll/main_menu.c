@@ -1,4 +1,5 @@
 #include "boss.h"
+#include "config.h"
 #include "game_mode.h"
 #include "main_menu.h"
 #include "settings.h"
@@ -6,7 +7,6 @@
 #include <common.h>
 
 #define ROW_TERMINATOR (-1)
-#define DEFAULT_NUM_LAPS 3
 
 static struct MenuRow rows[MAIN_MENU_MAX_ENTRIES + 1];
 static unsigned char entryId[MAIN_MENU_MAX_ENTRIES];
@@ -57,9 +57,13 @@ void MainMenu_AddEntry(int id, short stringIndex)
 	rows[entryCount].stringIndex = ROW_TERMINATOR;
 }
 
-struct MenuRow* MainMenu_GetRows()
+void MainMenu_Attach(struct RectMenu* mainMenu)
 {
-	return &rows[0];
+	mainMenu->rows = &rows[0];
+	if (mainMenu->rowSelected >= entryCount)
+	{
+		mainMenu->rowSelected = (short)(entryCount - 1);
+	}
 }
 
 int MainMenu_GetEntryId(int row)
@@ -80,17 +84,29 @@ void MainMenu_InstallStrings()
 	sdata->lngStrings[LNG_SETTINGS] = (char*)"SETTINGS";
 }
 
+static void MainMenu_AddMode(int mode, short stringIndex)
+{
+	if (Config_IsModeEnabled(mode))
+	{
+		MainMenu_AddEntry(mode, stringIndex);
+	}
+}
+
 void MainMenu_Build()
 {
 	MainMenu_Reset();
 
-	MainMenu_AddEntry(MODE_ARCADE, LNG_ARCADE);
-	MainMenu_AddEntry(MODE_RELIC_RACE, LNG_RELIC_RACE);
-	MainMenu_AddEntry(MODE_TIME_TRIAL, LNG_TIME_TRIAL);
-	MainMenu_AddEntry(MODE_CRYSTAL_CHALLENGE, LNG_CRYSTAL_CHALLENGE);
-	MainMenu_AddEntry(MODE_CTR_TOKEN, LNG_CTR_TOKEN);
-	MainMenu_AddEntry(MODE_BOSS_RACE, LNG_BOSS_RACE);
-	MainMenu_AddEntry(MODE_SETTINGS, LNG_SETTINGS);
+	MainMenu_AddMode(MODE_ARCADE, LNG_ARCADE);
+	MainMenu_AddMode(MODE_RELIC_RACE, LNG_RELIC_RACE);
+	MainMenu_AddMode(MODE_TIME_TRIAL, LNG_TIME_TRIAL);
+	MainMenu_AddMode(MODE_CRYSTAL_CHALLENGE, LNG_CRYSTAL_CHALLENGE);
+	MainMenu_AddMode(MODE_CTR_TOKEN, LNG_CTR_TOKEN);
+	MainMenu_AddMode(MODE_BOSS_RACE, LNG_BOSS_RACE);
+
+	if (Settings_IsAvailable())
+	{
+		MainMenu_AddEntry(MODE_SETTINGS, LNG_SETTINGS);
+	}
 }
 
 void MainMenu_Select(struct RectMenu* mainMenu)
@@ -113,7 +129,7 @@ void MainMenu_Select(struct RectMenu* mainMenu)
 	gGT->gameMode2 &= ~CHEAT_ALL;
 
 	gGT->numPlyrNextGame = 1;
-	gGT->numLaps = DEFAULT_NUM_LAPS;
+	gGT->numLaps = Config_Get()->laps;
 	sdata->gameProgress.unlocks[0] |= UNLOCK_CHARACTERS;
 
 	mainMenu->state |= ONLY_DRAW_TITLE;
