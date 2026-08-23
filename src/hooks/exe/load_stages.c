@@ -216,17 +216,24 @@ int LOAD_TenStages(struct GameTracker* gGT, int loadingStage, struct BigHeader* 
 
 		sdata->load_inProgress = 1;
 
+		int levelLOD = sdata->levelLOD;
+
 		if (levelID == CUSTOM_LEVEL_ID)
 		{
-			sdata->load_inProgress = 0;
-			HotReload_UploadVram();
-			break;
+			if (HotReload_HasStagedTrack())
+			{
+				sdata->load_inProgress = 0;
+				HotReload_UploadVram();
+				break;
+			}
+
+			levelLOD = 1;
 		}
 
-		u_int vramIndex = LOAD_GetBigfileIndex(levelID, sdata->levelLOD, LVI_VRAM);
+		u_int vramIndex = LOAD_GetBigfileIndex(levelID, levelLOD, LVI_VRAM);
 		LOAD_AppendQueue((int)bigfile, LT_VRAM, vramIndex, 0, 0);
 
-		u_int levIndex = LOAD_GetBigfileIndex(levelID, sdata->levelLOD, LVI_LEV);
+		u_int levIndex = LOAD_GetBigfileIndex(levelID, levelLOD, LVI_LEV);
 
 		if (Level_IsPlayable(levelID))
 		{
@@ -239,7 +246,7 @@ int LOAD_TenStages(struct GameTracker* gGT, int loadingStage, struct BigHeader* 
 
 		if ((gGT->gameMode2 & LEV_SWAP) != 0)
 		{
-			u_int ptrIndex = LOAD_GetBigfileIndex(levelID, sdata->levelLOD, LVI_PTR);
+			u_int ptrIndex = LOAD_GetBigfileIndex(levelID, levelLOD, LVI_PTR);
 			LOAD_AppendQueue((int)bigfile, LT_RAW, ptrIndex, sdata->PatchMem_Ptr, LOAD_Callback_PatchMem);
 		}
 		break;

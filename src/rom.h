@@ -4,6 +4,7 @@
 #include <common.h>
 
 #define CUSTOM_LEVEL_ID 0
+#define BAKED_TRACK 0
 
 #define TRIGGER_HOT_RELOAD (volatile int*) 0x8000C000
 #define TRIGGER_VRM_RELOAD (volatile int*) 0x8000C004

@@ -8,7 +8,7 @@
 
 unsigned Level_GetID()
 {
-	if (HotReload_HasStagedTrack())
+	if (BAKED_TRACK || HotReload_HasStagedTrack())
 	{
 		return CUSTOM_LEVEL_ID;
 	}
