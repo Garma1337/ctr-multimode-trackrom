@@ -12,7 +12,7 @@
 	            FEATURE_HOT_RELOAD | FEATURE_HOST_SETTINGS | \
 	            FEATURE_MAX_STATS, \
 	.modes = CONFIG_MODE_ALL, \
-	.editable = BEHAVIOR_ALL, \
+	.editable = OPTION_ALL, \
 	.relicSapphire = 77000, \
 	.relicGold = 65000, \
 	.relicPlatinum = 52000, \

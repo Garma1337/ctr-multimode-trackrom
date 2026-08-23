@@ -68,10 +68,10 @@ The `editable` mask has one bit per field. A field is shown only if its bit is s
 
 ```c
 .editable = 0,                                   // no settings panel at all
-.editable = BEHAVIOR_RELIC_SAPPHIRE
-          | BEHAVIOR_RELIC_GOLD
-          | BEHAVIOR_RELIC_PLATINUM,             // relic times only
-.editable = BEHAVIOR_ALL,                        // everything (the default)
+.editable = OPTION_RELIC_SAPPHIRE
+          | OPTION_RELIC_GOLD
+          | OPTION_RELIC_PLATINUM,             // relic times only
+.editable = OPTION_ALL,                        // everything (the default)
 ```
 
 The bit names are in `src/config_schema.h` and are asserted against the field order at compile time, so they cannot drift apart silently.
