@@ -1,6 +1,6 @@
-#include "dll/hot_reload.h"
-#include "dll/level.h"
-#include "rom.h"
+#include "../../dll/hot_reload.h"
+#include "../../dll/level.h"
+#include "../../rom.h"
 
 #include <common.h>
 

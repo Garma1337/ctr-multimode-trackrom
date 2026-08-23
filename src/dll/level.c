@@ -1,7 +1,7 @@
 #include "game_mode.h"
 #include "hot_reload.h"
 #include "level.h"
-#include "rom.h"
+#include "../rom.h"
 #include "settings.h"
 
 #include <common.h>

@@ -1,5 +1,5 @@
 #include "oxide.h"
-#include "rom.h"
+#include "../rom.h"
 
 #include <common.h>
 

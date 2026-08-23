@@ -2,7 +2,7 @@
 #include "input.h"
 #include "math.h"
 #include "prim.h"
-#include "rom.h"
+#include "../rom.h"
 #include "settings.h"
 
 #include <common.h>

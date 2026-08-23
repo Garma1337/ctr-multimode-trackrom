@@ -1,4 +1,4 @@
-#include "dll/config.h"
+#include "../../dll/config.h"
 
 #include <common.h>
 

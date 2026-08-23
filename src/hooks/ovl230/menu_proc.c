@@ -1,5 +1,5 @@
-#include "dll/config.h"
-#include "dll/main_menu.h"
+#include "../../dll/config.h"
+#include "../../dll/main_menu.h"
 
 #include <common.h>
 

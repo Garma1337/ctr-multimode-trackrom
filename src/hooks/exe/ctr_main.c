@@ -1,12 +1,12 @@
-#include "dll/boss.h"
-#include "dll/config.h"
-#include "dll/hot_reload.h"
-#include "dll/level.h"
-#include "dll/oxide.h"
-#include "dll/race.h"
-#include "dll/settings.h"
-#include "rom.h"
-#include "rom/boot.h"
+#include "../../dll/boss.h"
+#include "../../dll/config.h"
+#include "../../dll/hot_reload.h"
+#include "../../dll/level.h"
+#include "../../dll/oxide.h"
+#include "../../dll/race.h"
+#include "../../dll/settings.h"
+#include "../../rom.h"
+#include "../../rom/boot.h"
 
 #include <common.h>
 

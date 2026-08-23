@@ -1,7 +1,7 @@
 #ifndef CONFIG_RUNTIME_H
 #define CONFIG_RUNTIME_H
 
-#include "config_schema.h"
+#include "../config_schema.h"
 
 #include <common.h>
 

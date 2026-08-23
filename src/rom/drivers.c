@@ -1,8 +1,8 @@
-#include "dll/boss.h"
-#include "dll/game_mode.h"
-#include "dll/race.h"
+#include "../dll/boss.h"
+#include "../dll/game_mode.h"
+#include "../dll/race.h"
 #include "drivers.h"
-#include "rom.h"
+#include "../rom.h"
 
 #include <common.h>
 

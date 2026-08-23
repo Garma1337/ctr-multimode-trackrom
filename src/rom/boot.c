@@ -1,11 +1,11 @@
 #include "boot.h"
-#include "dll/boss.h"
-#include "dll/config.h"
-#include "dll/main_menu.h"
-#include "dll/oxide.h"
-#include "dll/settings.h"
+#include "../dll/boss.h"
+#include "../dll/config.h"
+#include "../dll/main_menu.h"
+#include "../dll/oxide.h"
+#include "../dll/settings.h"
 #include "drivers.h"
-#include "rom.h"
+#include "../rom.h"
 
 #include <common.h>
 

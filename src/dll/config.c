@@ -1,9 +1,9 @@
 #include "boss.h"
 #include "config.h"
-#include "config_default.h"
+#include "../config_default.h"
 #include "game_mode.h"
 #include "main_menu.h"
-#include "rom.h"
+#include "../rom.h"
 #include "settings.h"
 
 #include <common.h>

@@ -1,4 +1,4 @@
-#include "config_default.h"
+#include "../config_default.h"
 
 const struct
 {

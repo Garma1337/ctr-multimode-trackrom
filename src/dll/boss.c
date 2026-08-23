@@ -1,7 +1,7 @@
 #include "boss.h"
 #include "config.h"
 #include "main_menu.h"
-#include "rom.h"
+#include "../rom.h"
 
 #include <common.h>
 

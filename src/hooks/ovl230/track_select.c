@@ -1,5 +1,5 @@
-#include "rom.h"
-#include "dll/level.h"
+#include "../../rom.h"
+#include "../../dll/level.h"
 
 #include <common.h>
 
