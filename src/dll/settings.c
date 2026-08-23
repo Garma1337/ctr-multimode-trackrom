@@ -55,17 +55,20 @@ typedef enum FieldKind
 {
 	FIELD_TIME = 0,
 	FIELD_LAPS,
+	FIELD_ENUM,
 	FIELD_TOGGLE
 } FieldKind;
 
 static const char* const fieldLabels[SETTINGS_FIELD_COUNT] = {
-	"Relic - Sapphire",
-	"Relic - Gold",
-	"Relic - Platinum",
+	"Relic Time - Sapphire",
+	"Relic Time - Gold",
+	"Relic Time - Platinum",
+
 	"Crystal Time Limit",
-	"Laps",
+	"Lap Count",
 	"Intro Cutscene",
 	"Time Trial Ghosts",
+	"CTR Token Color",
 
 	"Freecam",
 	"Debug HUD",
@@ -95,6 +98,23 @@ static const unsigned char fieldKinds[SETTINGS_FEATURE_FIRST] = {
 	FIELD_LAPS,
 	FIELD_TOGGLE,
 	FIELD_TOGGLE,
+	FIELD_ENUM,
+};
+
+static const char* const tokenNames[TOKEN_COLOR_COUNT] = {
+	"Red",
+	"Green",
+	"Blue",
+	"Yellow",
+	"Purple",
+};
+
+static const char* const* fieldOptions[SETTINGS_FEATURE_FIRST] = {
+	[SETTINGS_CTR_TOKEN] = tokenNames,
+};
+
+static const unsigned char fieldOptionCount[SETTINGS_FEATURE_FIRST] = {
+	[SETTINGS_CTR_TOKEN] = TOKEN_COLOR_COUNT,
 };
 
 static int isOpen = 0;
@@ -144,6 +164,10 @@ static void Settings_FormatValue(char* out, int field)
 		sprintf(out, "%d", draft[field]);
 		return;
 
+	case FIELD_ENUM:
+		sprintf(out, "%s", fieldOptions[field][draft[field]]);
+		return;
+
 	case FIELD_TOGGLE:
 		sprintf(out, "%s", draft[field] ? "On" : "Off");
 		return;
@@ -184,6 +208,7 @@ static void Settings_LoadDraft(void)
 	draft[SETTINGS_LAPS] = config->laps;
 	draft[SETTINGS_INTRO_CUTSCENE] = (config->introCutscene != 0);
 	draft[SETTINGS_GHOST] = (config->ghosts != 0);
+	draft[SETTINGS_CTR_TOKEN] = config->ctrToken;
 
 	Settings_UnpackBits(config->features, SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
 	Settings_UnpackBits(config->modes, SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
@@ -201,6 +226,7 @@ static void Settings_Commit(void)
 	next.laps = (unsigned char)draft[SETTINGS_LAPS];
 	next.introCutscene = (unsigned char)draft[SETTINGS_INTRO_CUTSCENE];
 	next.ghosts = (unsigned char)draft[SETTINGS_GHOST];
+	next.ctrToken = (unsigned char)draft[SETTINGS_CTR_TOKEN];
 
 	next.features = Settings_PackBits(SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
 	next.modes = Settings_PackBits(SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
@@ -250,6 +276,10 @@ static void Settings_Adjust(int delta)
 	case FIELD_LAPS:
 		draft[field] = Math_Clamp(draft[field] + ((delta > 0) ? LAPS_STEP : -LAPS_STEP),
 			CONFIG_LAPS_MIN, CONFIG_LAPS_MAX) | 1;
+		return;
+
+	case FIELD_ENUM:
+		draft[field] = Math_Wrap(draft[field] + ((delta > 0) ? 1 : -1), fieldOptionCount[field]);
 		return;
 
 	case FIELD_TOGGLE:

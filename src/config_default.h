@@ -20,6 +20,7 @@
 	.introCutscene = 1, \
 	.ghosts = 1, \
 	.bosses = CONFIG_BOSS_ALL, \
+	.ctrToken = TOKEN_YELLOW, \
 }
 
 #endif

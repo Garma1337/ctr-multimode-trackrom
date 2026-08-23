@@ -17,6 +17,7 @@ _Static_assert(CONFIG_MODE_BOSS_RACE == (1 << MODE_BOSS_RACE), "mode bits drifte
 
 _Static_assert(BEHAVIOR_RELIC_SAPPHIRE == (1 << SETTINGS_RELIC_SAPPHIRE), "behavior bits drifted");
 _Static_assert(BEHAVIOR_LAPS == (1 << SETTINGS_LAPS), "behavior bits drifted");
+_Static_assert(BEHAVIOR_TOKEN_COLOR == (1 << SETTINGS_CTR_TOKEN), "behavior bits drifted");
 _Static_assert(BEHAVIOR_GHOST == (1 << SETTINGS_GHOST), "behavior bits drifted");
 _Static_assert(BEHAVIOR_FREECAM == (1 << SETTINGS_FREECAM), "behavior bits drifted");
 _Static_assert(BEHAVIOR_MODE_ARCADE == (1 << SETTINGS_MODE_ARCADE), "behavior bits drifted");
@@ -46,7 +47,7 @@ static ConfigStatus Config_Validate(const Config* loaded)
 		return CONFIG_TOO_NEW;
 	}
 
-	if (loaded->size < sizeof(Config))
+	if (loaded->size < CONFIG_MIN_SIZE)
 	{
 		return CONFIG_CORRUPT;
 	}
@@ -69,6 +70,11 @@ static void Config_Normalize()
 	// round an even count up to the next legal one
 	config.laps |= 1;
 
+	if (config.ctrToken >= TOKEN_COLOR_COUNT)
+	{
+		config.ctrToken = TOKEN_YELLOW;
+	}
+
 	if (config.modes == 0)
 	{
 		config.modes = CONFIG_MODE_ALL;
@@ -82,6 +88,8 @@ static void Config_Normalize()
 
 static void Config_Refresh()
 {
+	data.metaDataLEV[CUSTOM_LEVEL_ID].ctrTokenGroupID = config.ctrToken;
+
 	Settings_ApplyCodePatches();
 	MainMenu_Build();
 	Boss_InstallRows();
@@ -93,7 +101,7 @@ void Config_Load()
 
 	Config* loaded = (Config*)LOAD_XnfFile(CONFIG_PATH, CONFIG_ADDR, &size);
 
-	if ((loaded == 0) || (size < (int)sizeof(Config)))
+	if ((loaded == 0) || (size < CONFIG_MIN_SIZE))
 	{
 		status = CONFIG_MISSING;
 	}
@@ -103,7 +111,11 @@ void Config_Load()
 
 		if (status == CONFIG_OK)
 		{
-			config = *loaded;
+			Config defaults = CONFIG_DEFAULTS;
+			unsigned int copy = (loaded->size < sizeof(Config)) ? loaded->size : sizeof(Config);
+
+			config = defaults;
+			memcpy(&config, loaded, copy);
 		}
 	}
 

@@ -6,6 +6,7 @@
 #define CONFIG_FILE_SIZE 256
 #define CONFIG_LAPS_MIN 1
 #define CONFIG_LAPS_MAX 7
+#define CONFIG_MIN_SIZE 8
 
 typedef enum FeatureFlag
 {
@@ -38,27 +39,39 @@ typedef enum BehaviorFlag
 	BEHAVIOR_INTRO_CUTSCENE = 1 << 5,
 	BEHAVIOR_GHOST = 1 << 6,
 
-	BEHAVIOR_FREECAM = 1 << 7,
-	BEHAVIOR_DEBUG_HUD = 1 << 8,
-	BEHAVIOR_RESERVES = 1 << 9,
-	BEHAVIOR_HOT_RELOAD = 1 << 10,
-	BEHAVIOR_HOST_SETTINGS = 1 << 11,
+	BEHAVIOR_TOKEN_COLOR = 1 << 7,
 
-	BEHAVIOR_MODE_ARCADE = 1 << 12,
-	BEHAVIOR_MODE_RELIC_RACE = 1 << 13,
-	BEHAVIOR_MODE_TIME_TRIAL = 1 << 14,
-	BEHAVIOR_MODE_CRYSTAL_CHALLENGE = 1 << 15,
-	BEHAVIOR_MODE_CTR_TOKEN = 1 << 16,
-	BEHAVIOR_MODE_BOSS_RACE = 1 << 17,
+	BEHAVIOR_FREECAM = 1 << 8,
+	BEHAVIOR_DEBUG_HUD = 1 << 9,
+	BEHAVIOR_RESERVES = 1 << 10,
+	BEHAVIOR_HOT_RELOAD = 1 << 11,
+	BEHAVIOR_HOST_SETTINGS = 1 << 12,
 
-	BEHAVIOR_BOSS_RIPPER_ROO = 1 << 18,
-	BEHAVIOR_BOSS_PAPU_PAPU = 1 << 19,
-	BEHAVIOR_BOSS_KOMODO_JOE = 1 << 20,
-	BEHAVIOR_BOSS_PINSTRIPE = 1 << 21,
-	BEHAVIOR_BOSS_NITROS_OXIDE = 1 << 22,
+	BEHAVIOR_MODE_ARCADE = 1 << 13,
+	BEHAVIOR_MODE_RELIC_RACE = 1 << 14,
+	BEHAVIOR_MODE_TIME_TRIAL = 1 << 15,
+	BEHAVIOR_MODE_CRYSTAL_CHALLENGE = 1 << 16,
+	BEHAVIOR_MODE_CTR_TOKEN = 1 << 17,
+	BEHAVIOR_MODE_BOSS_RACE = 1 << 18,
 
-	BEHAVIOR_ALL = 0x7FFFFF,
+	BEHAVIOR_BOSS_RIPPER_ROO = 1 << 19,
+	BEHAVIOR_BOSS_PAPU_PAPU = 1 << 20,
+	BEHAVIOR_BOSS_KOMODO_JOE = 1 << 21,
+	BEHAVIOR_BOSS_PINSTRIPE = 1 << 22,
+	BEHAVIOR_BOSS_NITROS_OXIDE = 1 << 23,
+
+	BEHAVIOR_ALL = 0xFFFFFF,
 } BehaviorFlag;
+
+typedef enum TokenColor
+{
+	TOKEN_RED = 0,
+	TOKEN_GREEN,
+	TOKEN_BLUE,
+	TOKEN_YELLOW,
+	TOKEN_PURPLE,
+	TOKEN_COLOR_COUNT,
+} TokenColor;
 
 typedef enum BossFlag
 {
@@ -90,12 +103,13 @@ typedef struct Config
 	unsigned char introCutscene;
 	unsigned char ghosts;
 	unsigned char bosses;
+	unsigned char ctrToken; // TokenColor
 } Config;
 
 #if defined(__cplusplus)
-static_assert(sizeof(Config) == 40, "CONFIG.BIN layout changed; bump CONFIG_VERSION");
+static_assert(sizeof(Config) == 44, "CONFIG.BIN layout changed; bump CONFIG_VERSION");
 #else
-_Static_assert(sizeof(Config) == 40, "CONFIG.BIN layout changed; bump CONFIG_VERSION");
+_Static_assert(sizeof(Config) == 44, "CONFIG.BIN layout changed; bump CONFIG_VERSION");
 #endif
 
 #endif
