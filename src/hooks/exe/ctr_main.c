@@ -5,7 +5,7 @@
 #include "dll/settings.h"
 #include "rom.h"
 #include "rom/boot.h"
-#include "rom/game_mode.h"
+#include "dll/level.h"
 
 #include <common.h>
 
@@ -88,7 +88,7 @@ static void OnLoadingEnd()
 
 	Race_Reset();
 
-	if (GameMode_IsPlayableLevel(gGT->levelID)) { sdata->ptrActiveMenu = 0; }
+	if (Level_IsPlayable(gGT->levelID)) { sdata->ptrActiveMenu = 0; }
 }
 
 static void OnResetStage()
@@ -151,7 +151,7 @@ static int AdvanceLoading(struct GameTracker* gGT)
 	{
 		if (RaceFlag_IsFullyOnScreen() == 1)
 		{
-			GameMode_CommitLevelRequest();
+			Level_CommitRequest();
 
 			gGT->hudFlags &= ~8;
 

@@ -1,6 +1,6 @@
 #include "dll/hot_reload.h"
+#include "dll/level.h"
 #include "rom.h"
-#include "rom/game_mode.h"
 
 #include <common.h>
 
@@ -228,9 +228,7 @@ int LOAD_TenStages(struct GameTracker* gGT, int loadingStage, struct BigHeader* 
 
 		u_int levIndex = LOAD_GetBigfileIndex(levelID, sdata->levelLOD, LVI_LEV);
 
-		// Only the raced levels are big enough to exhaust MEMPACK. The menu and
-		// everything else keep the stock path, which works and is better tested.
-		if (GameMode_IsPlayableLevel(levelID))
+		if (Level_IsPlayable(levelID))
 		{
 			LOAD_AppendQueue((int)bigfile, LT_RAW, levIndex, CUSTOM_MAP_PTR_ADDR, &OnStagedLevelLoaded);
 		}

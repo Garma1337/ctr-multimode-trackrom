@@ -1,9 +1,9 @@
 #include "boot.h"
 #include "dll/boss.h"
+#include "dll/main_menu.h"
 #include "dll/oxide.h"
 #include "dll/settings.h"
 #include "drivers.h"
-#include "game_mode.h"
 #include "rom.h"
 
 #include <common.h>
@@ -111,7 +111,6 @@ void Boot_Run()
 
 	sdata->ptrBigfile1 = LOAD_ReadDirectory(rdata.s_PathTo_Bigfile);
 	LOAD_LangFile((int)sdata->ptrBigfile1, LANG_ENGLISH);
-	GameMode_InstallLanguageStrings();
 	GAMEPROG_NewGame_OnBoot();
 	gGT->overlayIndex_null_notUsed = 0;
 	gGT->levelID = MAIN_MENU_LEVEL;
@@ -140,7 +139,9 @@ void Boot_Run()
 	int dllSize;
 	LOAD_XnfFile(DLL_PATH, DLL_ADDR, &dllSize);
 
+	MainMenu_InstallStrings();
 	Boss_InstallRows();
+	MainMenu_Build();
 	Oxide_ScaleRaceModel();
 	Settings_ApplyCodePatches();
 }

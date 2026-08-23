@@ -1,0 +1,28 @@
+#ifndef GAME_MODE_H_MODEROM
+#define GAME_MODE_H_MODEROM
+
+#include <common.h>
+
+typedef enum GameModeRow
+{
+	MODE_ARCADE = 0,
+	MODE_RELIC_RACE,
+	MODE_TIME_TRIAL,
+	MODE_CRYSTAL_CHALLENGE,
+	MODE_CTR_TOKEN,
+	MODE_BOSS_RACE,
+	MODE_SETTINGS,
+	MODE_COUNT,
+} GameModeRow;
+
+#define MODE_FLAGS1 \
+	(BATTLE_MODE | TIME_TRIAL | ARCADE_MODE | RELIC_RACE | CRYSTAL_CHALLENGE | \
+	 ADVENTURE_MODE | ADVENTURE_ARENA | ADVENTURE_CUP | ADVENTURE_BOSS)
+
+#define MODE_FLAGS2 (CUP_ANY_KIND | TOKEN_RACE | SPAWN_AT_BOSS)
+
+void GameMode_Clear();
+void GameMode_Apply(int mode);
+int GameMode_NeedsArcadePack();
+
+#endif

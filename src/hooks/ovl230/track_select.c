@@ -1,11 +1,11 @@
 #include "rom.h"
-#include "rom/game_mode.h"
+#include "dll/level.h"
 
 #include <common.h>
 
 void MM_TrackSelect_MenuProc(struct RectMenu* menu)
 {
-	sdata->gameTracker.currLEV = GameMode_GetLevelID();
+	sdata->gameTracker.currLEV = Level_GetID();
 	D230.trackSel_transitionState = EXITING_MENU;
 
 	sdata->ptrGhostTapePlaying = MEMPACK_AllocHighMem(GHOST_FILESIZE);

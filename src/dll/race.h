@@ -3,6 +3,7 @@
 
 #include <common.h>
 
+void Race_ApplyStartingGrid(void);
 void Race_Reset(void);
 void Race_CaptureInput(void);
 void Race_RunGameLogic(struct GameTracker* gGT, struct GamepadSystem* gGS);

@@ -7,6 +7,7 @@
 #include <common.h>
 
 #define HUD_FLAG_RACING 1
+#define NUM_GRID_SLOTS 8
 
 static int hudHidden = 0;
 static int savedHudFlags = 0;
@@ -46,6 +47,16 @@ static void Race_RestoreVanillaHud(struct GameTracker* gGT)
 
 	gGT->hudFlags = (gGT->hudFlags & ~HUD_FLAG_RACING) | (savedHudFlags & HUD_FLAG_RACING);
 	hudHidden = 0;
+}
+
+void Race_ApplyStartingGrid(void)
+{
+	int playerLast = (sdata->gGT->gameMode2 & TOKEN_RACE) != 0;
+
+	for (int i = 0; i < NUM_GRID_SLOTS; i++)
+	{
+		sdata->kartSpawnOrderArray[i] = playerLast ? (char)((i + NUM_GRID_SLOTS - 1) % NUM_GRID_SLOTS) : (char)i;
+	}
 }
 
 void Race_Reset(void)

@@ -1,6 +1,6 @@
 #include "boss.h"
 #include "rom.h"
-#include "rom/game_mode.h"
+#include "main_menu.h"
 
 #include <common.h>
 
@@ -93,7 +93,7 @@ static void Boss_MenuProc(struct RectMenu* menu)
 	selectedBoss = row;
 	sdata->gGT->bossID = row;
 
-	GameMode_EnterCharacterSelect();
+	MainMenu_EnterCharacterSelect();
 
 	menu->state |= ONLY_DRAW_TITLE;
 }

@@ -1,6 +1,7 @@
 #include "dll/boss.h"
+#include "dll/game_mode.h"
+#include "dll/race.h"
 #include "drivers.h"
-#include "game_mode.h"
 #include "rom.h"
 
 #include <common.h>
@@ -83,7 +84,7 @@ void Drivers_QueueModePack(struct BigHeader* bigfile, void* callback)
 	}
 
 	LOAD_Robots1P(data.characterIDs[0]);
-	GameMode_ApplyStartingGrid();
+	Race_ApplyStartingGrid();
 
 	LOAD_AppendQueue((int)bigfile, LT_DRAM, BI_1PARCADEPACK + data.characterIDs[0], NULL, callback);
 }
