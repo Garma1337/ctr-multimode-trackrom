@@ -62,19 +62,128 @@ Turning a mode off removes its row; the remaining rows renumber and the menu re-
 
 Turning *all* modes or *all* bosses off is normalised back to "everything" rather than leaving an empty menu, so you cannot lock yourself out.
 
-## Hiding the settings panel
+## Editing the config
 
-The `editable` mask has one bit per field. A field is shown only if its bit is set. Set the mask to `0` and the SETTINGS row disappears from the main menu entirely, which is what a shipped ROM usually wants.
+Everything lives in one block in `src/config_default.h`. It looks like this:
 
 ```c
-.editable = 0,                                   // no settings panel at all
-.editable = OPTION_RELIC_SAPPHIRE
-          | OPTION_RELIC_GOLD
-          | OPTION_RELIC_PLATINUM,             // relic times only
-.editable = OPTION_ALL,                        // everything (the default)
+#define CONFIG_DEFAULTS \
+{ \
+	.magic = CONFIG_MAGIC, \
+	.version = CONFIG_VERSION, \
+	.size = sizeof(Config), \
+	.features = FEATURE_FREECAM | FEATURE_DEBUG_HUD | FEATURE_RESERVES | \
+	            FEATURE_HOT_RELOAD | FEATURE_HOST_SETTINGS | \
+	            FEATURE_MAX_STATS, \
+	.modes = CONFIG_MODE_ALL, \
+	.editable = OPTION_ALL, \
+	.relicSapphire = 77000, \
+	.relicGold = 65000, \
+	.relicPlatinum = 52000, \
+	.crystalTime = 120000, \
+	.laps = 3, \
+	.introCutscene = 1, \
+	.ghosts = 1, \
+	.bosses = CONFIG_BOSS_ALL, \
+	.ctrToken = TOKEN_YELLOW, \
+}
 ```
 
-The bit names are in `src/config_schema.h` and are asserted against the field order at compile time, so they cannot drift apart silently.
+Four things to know before editing it:
+
+- **Every line ends with a `\`.** The whole block is one long definition and the backslash joins the lines together. If you add or move a line, make sure it still ends with one — a missing backslash is the most common way to break this file. The closing `}` is the only line without one.
+- **`.name = value,`** — keep the leading dot and the trailing comma.
+- **`|` means "and also".** `FEATURE_FREECAM | FEATURE_DEBUG_HUD` is "freecam and the debug HUD". Anything you leave out is off.
+- **Times are in milliseconds.** 1 second is `1000`, so `77000` is 1:17.0.
+
+The names you can use are listed in `src/config_schema.h`:
+
+| Setting     | Names to use    | Meaning                                 |
+|-------------|-----------------|-----------------------------------------|
+| `.features` | `FEATURE_*`     | which tools and behaviours are enabled  |
+| `.modes`    | `CONFIG_MODE_*` | which rows appear on the main menu      |
+| `.bosses`   | `CONFIG_BOSS_*` | which bosses the picker offers          |
+| `.editable` | `OPTION_*`      | which rows appear in the settings panel |
+| `.ctrToken` | `TOKEN_*`       | the CTR token colour                    |
+
+`CONFIG_MODE_ALL`, `CONFIG_BOSS_ALL` and `OPTION_ALL` are shorthand for "every one of them".
+
+## Examples
+
+Each example shows only the lines you change; leave the rest of the block alone.
+
+### A time trial track — only two modes on the menu
+
+```c
+	.modes = CONFIG_MODE_TIME_TRIAL | CONFIG_MODE_RELIC_RACE, \
+```
+
+The main menu now has two rows plus SETTINGS. The modes you left out are gone entirely.
+
+### Ship with no settings panel
+
+```c
+	.editable = 0, \
+```
+
+`0` means no rows are editable, so the SETTINGS row disappears from the main menu. This is what most released tracks want — the player gets the times and rules you chose.
+
+### Let players change the relic times, nothing else
+
+```c
+	.editable = OPTION_RELIC_SAPPHIRE | OPTION_RELIC_GOLD | OPTION_RELIC_PLATINUM, \
+```
+
+SETTINGS appears with exactly three rows in it.
+
+### Only race two of the bosses
+
+```c
+	.modes = CONFIG_MODE_BOSS_RACE, \
+	.bosses = CONFIG_BOSS_RIPPER_ROO | CONFIG_BOSS_NITROS_OXIDE, \
+```
+
+The boss picker offers Ripper Roo and N. Oxide only.
+
+### Strip the development tools out of a release
+
+```c
+	.features = FEATURE_MAX_STATS, \
+	.editable = 0, \
+```
+
+No freecam, no debug HUD, no reserve bar, and the ROM stops listening for the editor. Keeping `FEATURE_MAX_STATS` leaves the updated engine stats on; drop it too for vanilla handling.
+
+### Your own times and rules
+
+```c
+	.relicSapphire = 90000, \
+	.relicGold = 80000, \
+	.relicPlatinum = 70000, \
+	.crystalTime = 150000, \
+	.laps = 5, \
+	.ctrToken = TOKEN_RED, \
+	.introCutscene = 0, \
+```
+
+Relic targets of 1:30 / 1:20 / 1:10, a 2:30 crystal timer, five laps, red tokens, and the intro camera fly-in skipped.
+
+### A finished release, all together
+
+```c
+	.features = FEATURE_MAX_STATS, \
+	.modes = CONFIG_MODE_ARCADE | CONFIG_MODE_TIME_TRIAL | CONFIG_MODE_RELIC_RACE, \
+	.editable = 0, \
+	.relicSapphire = 90000, \
+	.relicGold = 80000, \
+	.relicPlatinum = 70000, \
+	.laps = 3, \
+	.ctrToken = TOKEN_BLUE, \
+```
+
+One caveat worth repeating: setting `.modes` or `.bosses` to `0` does **not** hide everything — an empty mask is treated as "all of them" so the ROM can never boot to a menu with no rows. If you want a single mode, name that one mode.
+
+If you get it wrong, the build will fail with an error pointing at `config_default.h` rather than producing a broken ROM. A misspelled name or a missing backslash is caught at compile time.
 
 ## Shipping a ROM with your own track
 
