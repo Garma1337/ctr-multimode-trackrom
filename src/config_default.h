@@ -9,7 +9,8 @@
 	.version = CONFIG_VERSION, \
 	.size = sizeof(Config), \
 	.features = FEATURE_FREECAM | FEATURE_DEBUG_HUD | FEATURE_RESERVES | \
-	            FEATURE_HOT_RELOAD | FEATURE_HOST_SETTINGS, \
+	            FEATURE_HOT_RELOAD | FEATURE_HOST_SETTINGS | \
+	            FEATURE_MAX_STATS, \
 	.modes = CONFIG_MODE_ALL, \
 	.editable = BEHAVIOR_ALL, \
 	.relicSapphire = 77000, \

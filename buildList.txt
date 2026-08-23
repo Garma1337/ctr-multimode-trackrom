@@ -33,10 +33,7 @@ common, exe, LOAD_DriverMPK, 0x0, src/hooks/exe/driver_pack.c
 common, exe, VehBirth_GetModelByName, 0x0, src/hooks/exe/model_search.c
 common, exe, MainDB_GetClipSize, 0x0, src/hooks/exe/clip_buffer.c
 common, exe, MEMCARD_Save, 0x0, src/hooks/exe/memcard_save.c
+common, exe, VehBirth_SetConsts, 0x0, src/hooks/exe/engine_stats.c
 
 common, exe, rdata_free, 0x0, src/rom/boot.c src/rom/drivers.c, rom_core
-
-// Its own file on the disc so a tool can rewrite it in a finished ISO without
-// touching the exe, the DLL or the bigfile. The address is only where the blob
-// links; boot reads it to CONFIG_ADDR.
 common, CONFIG, 0x802F0000, 0x0, src/config/config_data.c, CONFIG.BIN

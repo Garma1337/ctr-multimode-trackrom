@@ -75,6 +75,7 @@ static const char* const fieldLabels[SETTINGS_FIELD_COUNT] = {
 	"Reserves Display",
 	"Hot Reload",
 	"Host Settings",
+	"Updated Stats",
 
 	"Mode - Arcade",
 	"Mode - Relic Race",

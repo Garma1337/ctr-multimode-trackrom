@@ -18,6 +18,7 @@ _Static_assert(CONFIG_MODE_BOSS_RACE == (1 << MODE_BOSS_RACE), "mode bits drifte
 _Static_assert(BEHAVIOR_RELIC_SAPPHIRE == (1 << SETTINGS_RELIC_SAPPHIRE), "behavior bits drifted");
 _Static_assert(BEHAVIOR_LAPS == (1 << SETTINGS_LAPS), "behavior bits drifted");
 _Static_assert(BEHAVIOR_TOKEN_COLOR == (1 << SETTINGS_CTR_TOKEN), "behavior bits drifted");
+_Static_assert(BEHAVIOR_MAX_STATS == (1 << SETTINGS_MAX_STATS), "behavior bits drifted");
 _Static_assert(BEHAVIOR_GHOST == (1 << SETTINGS_GHOST), "behavior bits drifted");
 _Static_assert(BEHAVIOR_FREECAM == (1 << SETTINGS_FREECAM), "behavior bits drifted");
 _Static_assert(BEHAVIOR_MODE_ARCADE == (1 << SETTINGS_MODE_ARCADE), "behavior bits drifted");
@@ -26,6 +27,7 @@ _Static_assert(BEHAVIOR_ALL == ((1 << SETTINGS_FIELD_COUNT) - 1), "behavior mask
 
 _Static_assert(FEATURE_FREECAM == (1 << (SETTINGS_FREECAM - SETTINGS_FEATURE_FIRST)), "feature run drifted");
 _Static_assert(FEATURE_HOST_SETTINGS == (1 << (SETTINGS_HOST_SETTINGS - SETTINGS_FEATURE_FIRST)), "feature run drifted");
+_Static_assert(FEATURE_MAX_STATS == (1 << (SETTINGS_MAX_STATS - SETTINGS_FEATURE_FIRST)), "feature run drifted");
 _Static_assert(CONFIG_MODE_BOSS_RACE == (1 << (SETTINGS_MODE_BOSS_RACE - SETTINGS_MODE_FIRST)), "mode run drifted");
 _Static_assert(CONFIG_BOSS_NITROS_OXIDE == (1 << (SETTINGS_BOSS_NITROS_OXIDE - SETTINGS_BOSS_FIRST)), "boss run drifted");
 
