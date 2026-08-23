@@ -24,7 +24,6 @@
 #define AUDIO_ADV_PODIUM    6
 #define AUDIO_MAIN_MENU     7
 
-#define PRIM_MEM_BASE 0x80600000
 #define PRIM_MEM_SIZE (0x100000 - 0x1000)
 
 #define LEVEL_LOD_SOLO 8

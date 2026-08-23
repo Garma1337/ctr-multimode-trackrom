@@ -47,9 +47,15 @@ typedef enum HotReloadStep
 #define GHOST_LOCATION      (GHOST_SIZE_LOCATION + sizeof(int))
 #define DRIVER_LOCATION     (GHOST_LOCATION + GHOST_FILESIZE)
 #define DLL_LOCATION        (DRIVER_LOCATION + DRIVER_FILESIZE)
+#define CONFIG_LOCATION     0x802F0000
 
-#define CUSTOM_LEV_MAP_LOCATION 0x80300000
+#define CD_SECTOR_SIZE      0x800
+
+#define PRIM_MEM_BASE           0x80600000
+#define CUSTOM_LEV_MAP_LOCATION (CONFIG_LOCATION + CD_SECTOR_SIZE)
 #define CUSTOM_LEV_LOCATION     (CUSTOM_LEV_MAP_LOCATION + sizeof(int))
+
+#define CUSTOM_LEV_MAX_SIZE     (PRIM_MEM_BASE - CUSTOM_LEV_MAP_LOCATION)
 
 #define CUSTOM_VRAM_ADDR    (char*) VRM_LOCATION
 #define GHOST_SIZE_ADDR     (int*) GHOST_SIZE_LOCATION
@@ -62,11 +68,11 @@ typedef enum HotReloadStep
 
 _Static_assert(DLL_LOCATION == 0x802C8A00, "DLL_LOCATION must match the DLL line in buildList.txt");
 
-#define CONFIG_LOCATION     0x802F0000
 #define CONFIG_ADDR         (char*) CONFIG_LOCATION
 #define CONFIG_PATH         "\\CONFIG.BIN;1"
 
 _Static_assert(CONFIG_LOCATION > DLL_LOCATION, "CONFIG must sit above the DLL");
+_Static_assert(CUSTOM_LEV_MAP_LOCATION >= (CONFIG_LOCATION + CD_SECTOR_SIZE), "custom LEV overlaps the config sector");
 
 // sdata->mainGameState
 typedef enum MainState
