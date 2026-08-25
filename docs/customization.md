@@ -35,7 +35,7 @@ The three relic times are the targets for Relic Race; the defaults are Crash Cov
 
 **Lap Count** only offers 1, 3, 5 and 7 because those are the only counts vanilla CTR handles — the lap-time table holds seven entries per driver and the end-of-race box only has heights for those four.
 
-**CTR Token Color** exists because a custom track uses Dingo Canyon's level slot and inherits its metadata, which is where the token takes its color from. Without this the token is always yellow.
+**CTR Token Color** exists because a custom track takes over a vanilla level slot — Dingo Canyon by default — and inherits its metadata, which is where the token takes its color from. Without this the token is always yellow.
 
 **Intro Cutscene** off skips the race intro camera fly-in, which saves a few seconds on every retry.
 
@@ -198,7 +198,7 @@ common, bigfilelevelstracksproto81Pdatavrm, 0x0, 0x0, src/assets/customtrack.vrm
 common, bigfilelevelstracksproto81Pdatalev, 0x0, 0x0, src/assets/customtrack.lev
 ```
 
-These write your files over Dingo Canyon's bigfile entries. The bigfile is repacked afterwards, so your files may be larger than the originals.
+These write your files over Dingo Canyon's bigfile entries. The bigfile is repacked afterwards, so your files may be larger than the originals. To take over a different level instead, see [Overriding a different level](#overriding-a-different-level).
 
 **3. Set `BAKED_TRACK` to `1` in `src/rom.h`.** Without it the ROM keeps falling back to Crash Cove no matter what is on the disc.
 
@@ -214,6 +214,53 @@ An editor push still overrides a baked track while the editor is attached, so yo
 |------|-------------------------------------------------------|
 | lev  | `CUSTOM_LEV_MAX_SIZE`, currently **3,209,216 bytes**  |
 | vrm  | exactly `VRM_FILESIZE`, **458,808 bytes** (`0x70038`) |
+
+### Overriding a different level
+
+The custom track takes over a vanilla level slot, `CUSTOM_LEVEL_ID` in `src/rom.h`, which defaults to `0` — Dingo Canyon. Everything else derives from it, so changing that one define moves the whole ROM to another slot.
+
+You would do this because a custom track inherits the slot's metadata, and some of it is not configurable:
+
+| Inherited from the slot   | Effect                          |
+|---------------------------|---------------------------------|
+| `data.levBank_FX[]`       | which music and FX bank loads   |
+| `data.reverbMode[]`       | the reverb preset               |
+| `data.ArcadeDifficulty[]` | bot difficulty tuning           |
+| `data.metaDataLEV[]`      | token color, N. Tropy time, hub |
+
+The ROM already overrides the two that matter most — the token color comes from your config, and the N. Tropy ghost time can be disabled. The music, ambience and bot tuning are currently the reason to move the slot.
+
+**1. Change the define** in `src/rom.h`:
+
+```c
+#define CUSTOM_LEVEL_ID 12   // POLAR_PASS
+```
+
+Names are in `namespace_Level.h`; you can write the name instead of the number.
+
+**2. Retarget the bake lines** in `buildList.txt` to that level's bigfile folder. The folder name is not the track name — Polar Pass is `ice1`:
+
+```
+common, bigfilelevelstracksice11Pdatavrm, 0x0, 0x0, src/assets/customtrack.vrm
+common, bigfilelevelstracksice11Pdatalev, 0x0, 0x0, src/assets/customtrack.lev
+```
+
+| ID | Level          | Folder    | ID | Level           | Folder    |
+|----|----------------|-----------|----|-----------------|-----------|
+| 0  | Dingo Canyon   | `proto8`  | 9  | Mystery Caves   | `cave1`   |
+| 1  | Dragon Mines   | `proto9`  | 10 | Cortex Castle   | `castle1` |
+| 2  | Blizzard Bluff | `desert2` | 11 | N. Gin Labs     | `labs1`   |
+| 3  | Crash Cove     | `island1` | 12 | Polar Pass      | `ice1`    |
+| 4  | Tiger Temple   | `temple1` | 13 | Oxide Station   | `space`   |
+| 5  | Papu Pyramid   | `temple2` | 14 | Coco Park       | `coco1`   |
+| 6  | Roo's Tubes    | `tube1`   | 15 | Tiny Arena      | `arena2`  |
+| 7  | Hot Air Skyway | `blimp1`  | 16 | Slide Coliseum  | `secret1` |
+| 8  | Sewer Speedway | `sewer1`  | 17 | Turbo Track     | `secret2` |
+
+Two rules constrain the choice:
+
+- **Stay in 0-17.** Above that are the battle arenas and the adventure hubs, which load a different set of threads, have no checkpoints and no relic support. The engine keys several things on the ID being a race track, including a per-level array with exactly eighteen entries.
+- **Not Crash Cove (3) or Skull Rock (21).** Those are the fallback levels the ROM loads when no custom track is present. The custom level is intercepted before the normal disc read, so a collision would swallow the fallback.
 
 ## CONFIG.BIN for tooling
 
