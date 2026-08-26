@@ -1,4 +1,3 @@
-#include "../../dll/config.h"
 #include "../../dll/main_menu.h"
 
 #include <common.h>
@@ -10,13 +9,6 @@ void MM_MenuProc_Main(struct RectMenu* mainMenu)
 	DecalFont_DrawLine("Multi-Gamemode Test ROM", 5, 197, FONT_SMALL, BLUE);
 	DecalFont_DrawLine(__DATE__, 5, 207, FONT_SMALL, LIME_GREEN);
 	DecalFont_DrawLine(__TIME__, 170, 207, FONT_SMALL, LIME_GREEN);
-
-	const char* configError = Config_GetStatusText();
-
-	if (configError != 0)
-	{
-		DecalFont_DrawLine((char*)configError, 5, 187, FONT_SMALL, RED);
-	}
 
 	if (mainMenu->unk1e == 1)
 	{

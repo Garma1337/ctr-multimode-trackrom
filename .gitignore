@@ -5,3 +5,4 @@ debug/
 output/
 Makefile
 overlay.ld
+src/user_config.h

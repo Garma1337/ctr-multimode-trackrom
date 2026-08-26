@@ -141,6 +141,7 @@ void Boot_Run()
 	LOAD_XnfFile(DLL_PATH, DLL_ADDR, &dllSize);
 
 	MainMenu_InstallStrings();
-	Config_Load();
+	Boss_InstallStrings();
+	Config_Init();
 	Oxide_ScaleRaceModel();
 }

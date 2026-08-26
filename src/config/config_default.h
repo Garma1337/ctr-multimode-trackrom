@@ -1,0 +1,126 @@
+#ifndef CONFIG_DEFAULT_H
+#define CONFIG_DEFAULT_H
+
+#include "boss_item_presets.h"
+#include "config_schema.h"
+#include "overrides.h"
+
+#ifndef CFG_FEATURES
+#define CFG_FEATURES (FEATURE_FREECAM | FEATURE_DEBUG_HUD | FEATURE_RESERVES | \
+                      FEATURE_HOT_RELOAD | FEATURE_HOST_SETTINGS | FEATURE_MAX_STATS)
+#endif
+
+#ifndef CFG_MODES
+#define CFG_MODES CONFIG_MODE_ALL
+#endif
+
+#ifndef CFG_BOSSES
+#define CFG_BOSSES CONFIG_BOSS_ALL
+#endif
+
+#ifndef CFG_EDITABLE
+#define CFG_EDITABLE OPTION_ALL
+#endif
+
+#ifndef CFG_RELIC_SAPPHIRE
+#define CFG_RELIC_SAPPHIRE 77000
+#endif
+
+#ifndef CFG_RELIC_GOLD
+#define CFG_RELIC_GOLD 65000
+#endif
+
+#ifndef CFG_RELIC_PLATINUM
+#define CFG_RELIC_PLATINUM 52000
+#endif
+
+#ifndef CFG_CRYSTAL_TIME
+#define CFG_CRYSTAL_TIME 120000
+#endif
+
+#ifndef CFG_GHOST_TIME_1
+#define CFG_GHOST_TIME_1 115000
+#endif
+
+#ifndef CFG_GHOST_TIME_2
+#define CFG_GHOST_TIME_2 105000
+#endif
+
+#ifndef CFG_GHOST_CHARACTER_1
+#define CFG_GHOST_CHARACTER_1 GHOST_CHARACTER_1_DEFAULT
+#endif
+
+#ifndef CFG_GHOST_CHARACTER_2
+#define CFG_GHOST_CHARACTER_2 GHOST_CHARACTER_2_DEFAULT
+#endif
+
+#ifndef CFG_LAPS
+#define CFG_LAPS 3
+#endif
+
+#ifndef CFG_INTRO_CUTSCENE
+#define CFG_INTRO_CUTSCENE 1
+#endif
+
+#ifndef CFG_GHOSTS
+#define CFG_GHOSTS 1
+#endif
+
+#ifndef CFG_HIGH_LOD
+#define CFG_HIGH_LOD 1
+#endif
+
+#ifndef CFG_CTR_TOKEN
+#define CFG_CTR_TOKEN TOKEN_YELLOW
+#endif
+
+#ifndef CFG_BOSS_ITEM_PRESET_1
+#define CFG_BOSS_ITEM_PRESET_1 BOSS_ITEM_PRESET_VANILLA
+#endif
+
+#ifndef CFG_BOSS_ITEM_PRESET_2
+#define CFG_BOSS_ITEM_PRESET_2 BOSS_ITEM_PRESET_VANILLA
+#endif
+
+#ifndef CFG_BOSS_ITEM_PRESET_3
+#define CFG_BOSS_ITEM_PRESET_3 BOSS_ITEM_PRESET_VANILLA
+#endif
+
+#ifndef CFG_BOSS_ITEM_PRESET_4
+#define CFG_BOSS_ITEM_PRESET_4 BOSS_ITEM_PRESET_VANILLA
+#endif
+
+#ifndef CFG_BOSS_ITEM_PRESET_5
+#define CFG_BOSS_ITEM_PRESET_5 BOSS_ITEM_PRESET_VANILLA
+#endif
+
+#define CONFIG_DEFAULTS \
+{ \
+	.magic = CONFIG_MAGIC, \
+	.version = CONFIG_VERSION, \
+	.size = sizeof(Config), \
+	.editable = CFG_EDITABLE, \
+	.features = CFG_FEATURES, \
+	.modes = CFG_MODES, \
+	.relicSapphire = CFG_RELIC_SAPPHIRE, \
+	.relicGold = CFG_RELIC_GOLD, \
+	.relicPlatinum = CFG_RELIC_PLATINUM, \
+	.crystalTime = CFG_CRYSTAL_TIME, \
+	.ghostTime = { CFG_GHOST_TIME_1, CFG_GHOST_TIME_2 }, \
+	.laps = CFG_LAPS, \
+	.introCutscene = CFG_INTRO_CUTSCENE, \
+	.ghosts = CFG_GHOSTS, \
+	.highLod = CFG_HIGH_LOD, \
+	.bosses = CFG_BOSSES, \
+	.ctrToken = CFG_CTR_TOKEN, \
+	.ghostCharacter = { CFG_GHOST_CHARACTER_1, CFG_GHOST_CHARACTER_2 }, \
+	.bossItemPreset = { \
+		CFG_BOSS_ITEM_PRESET_1, \
+		CFG_BOSS_ITEM_PRESET_2, \
+		CFG_BOSS_ITEM_PRESET_3, \
+		CFG_BOSS_ITEM_PRESET_4, \
+		CFG_BOSS_ITEM_PRESET_5, \
+	}, \
+}
+
+#endif

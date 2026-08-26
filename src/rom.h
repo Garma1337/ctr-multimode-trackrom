@@ -1,12 +1,18 @@
 #ifndef ROM_H
 #define ROM_H
 
-#include "config_schema.h"
+#include "config/config_schema.h"
+#include "config/overrides.h"
 
 #include <common.h>
 
+#ifndef CUSTOM_LEVEL_ID
 #define CUSTOM_LEVEL_ID 0
+#endif
+
+#ifndef BAKED_TRACK
 #define BAKED_TRACK 0
+#endif
 
 #define TRIGGER_HOT_RELOAD (volatile int*) 0x8000C000
 #define TRIGGER_VRM_RELOAD (volatile int*) 0x8000C004
@@ -44,12 +50,11 @@ typedef enum HotReloadStep
 #define GHOST_LOCATION      (GHOST_SIZE_LOCATION + sizeof(int))
 #define DRIVER_LOCATION     (GHOST_LOCATION + GHOST_FILESIZE)
 #define DLL_LOCATION        (DRIVER_LOCATION + DRIVER_FILESIZE)
-#define CONFIG_LOCATION     0x802F0000
 
 #define CD_SECTOR_SIZE      0x800
 
 #define PRIM_MEM_BASE           0x80600000
-#define CUSTOM_LEV_MAP_LOCATION (CONFIG_LOCATION + CD_SECTOR_SIZE)
+#define CUSTOM_LEV_MAP_LOCATION 0x802F0000
 #define CUSTOM_LEV_LOCATION     (CUSTOM_LEV_MAP_LOCATION + sizeof(int))
 
 #define CUSTOM_LEV_MAX_SIZE     (PRIM_MEM_BASE - CUSTOM_LEV_MAP_LOCATION)
@@ -64,12 +69,7 @@ typedef enum HotReloadStep
 #define DLL_PATH            "\\DLL.BIN;1"
 
 _Static_assert(DLL_LOCATION == 0x802C8A00, "DLL_LOCATION must match the DLL line in buildList.txt");
-
-#define CONFIG_ADDR         (char*) CONFIG_LOCATION
-#define CONFIG_PATH         "\\CONFIG.BIN;1"
-
-_Static_assert(CONFIG_LOCATION > DLL_LOCATION, "CONFIG must sit above the DLL");
-_Static_assert(CUSTOM_LEV_MAP_LOCATION >= (CONFIG_LOCATION + CD_SECTOR_SIZE), "custom LEV overlaps the config sector");
+_Static_assert(CUSTOM_LEV_MAP_LOCATION > DLL_LOCATION, "the custom LEV must sit above the DLL");
 
 // sdata->mainGameState
 typedef enum MainState

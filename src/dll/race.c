@@ -1,7 +1,9 @@
 #include "config.h"
 #include "debug.h"
 #include "freecam.h"
+#include "ghost.h"
 #include "input.h"
+#include "lod.h"
 #include "race.h"
 #include "reserves.h"
 
@@ -63,6 +65,7 @@ void Race_ApplyStartingGrid(void)
 void Race_Reset(void)
 {
 	hudHidden = 0;
+	Lod_Apply();
 	Freecam_Reset();
 	Debug_Reset();
 }
@@ -83,6 +86,8 @@ void Race_Update(struct GameTracker* gGT)
 	{
 		return;
 	}
+
+	Ghost_Update(gGT);
 
 	if (!Race_InRace(gGT))
 	{

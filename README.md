@@ -47,7 +47,7 @@ The default levels already satisfy all of this. It matters for tracks you author
 ## Source layout
 
     src/assets/        customtrack.lev / customtrack.vrm when baking a track
-    src/config/        the default config, compiled into CONFIG.BIN
+    src/config/        config schema, defaults, boss item presets
     src/rom/           appended to the EXE's rdata_free
     src/dll/           DLL.BIN, loaded into high RAM at boot
     src/hooks/exe/     in-place overwrites of EXE functions

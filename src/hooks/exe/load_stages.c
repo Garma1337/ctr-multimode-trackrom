@@ -1,3 +1,4 @@
+#include "../../dll/ghost.h"
 #include "../../dll/hot_reload.h"
 #include "../../dll/level.h"
 #include "../../rom.h"
@@ -36,7 +37,6 @@ static int PickThreadOverlay(struct GameTracker* gGT, int levelID);
 static int PickLoadedAudioState(struct GameTracker* gGT);
 static void ConfigureGameModeForLevel(struct GameTracker* gGT, int levelID);
 static void ReservePrimAndOtMemory(struct GameTracker* gGT);
-static void AdoptGhostDriversFromLevel();
 static void SetupPodiumModels(struct GameTracker* gGT);
 static void OnStagedLevelLoaded(struct LoadQueueSlot* lqs);
 
@@ -167,7 +167,7 @@ int LOAD_TenStages(struct GameTracker* gGT, int loadingStage, struct BigHeader* 
 
 		if (levelID == CUSTOM_LEVEL_ID)
 		{
-			AdoptGhostDriversFromLevel();
+			Ghost_AdoptDrivers();
 		}
 
 		LOAD_DriverMPK(bigfile, sdata->levelLOD, &LOAD_Callback_DriverModels);
@@ -438,9 +438,6 @@ static void ReservePrimAndOtMemory(struct GameTracker* gGT)
 
 static void OnStagedLevelLoaded(struct LoadQueueSlot* lqs)
 {
-	// LOAD_DramFileCallback only runs the pointer map when the offset is
-	// non-negative -- adventure hub LEVs store a negative one. Match that, or a
-	// negative offset sends LOAD_RunPtrMap relocating whatever is behind us.
 	if (*CUSTOM_MAP_PTR_ADDR >= 0)
 	{
 		HotReload_ApplyStagedLevel();
@@ -448,28 +445,6 @@ static void OnStagedLevelLoaded(struct LoadQueueSlot* lqs)
 
 	sdata->ptrLevelFile = (struct Level*)CUSTOM_LEV_ADDR;
 	sdata->load_inProgress = 0;
-}
-
-static void AdoptGhostDriversFromLevel()
-{
-	struct Level* lev = (struct Level*)CUSTOM_LEV_ADDR;
-
-	if (lev->ptrSpawnType1->count <= 0)
-	{
-		return;
-	}
-
-	void** spawns = ST1_GETPOINTERS(lev->ptrSpawnType1);
-
-	if (spawns[ST1_NTROPY])
-	{
-		data.characterIDs[2] = ((struct GhostHeader*)spawns[ST1_NTROPY])->characterID;
-	}
-
-	if (spawns[ST1_NOXIDE])
-	{
-		data.characterIDs[3] = ((struct GhostHeader*)spawns[ST1_NOXIDE])->characterID;
-	}
 }
 
 static int PickEndRaceOverlay(struct GameTracker* gGT)

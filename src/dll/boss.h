@@ -1,18 +1,23 @@
 #ifndef BOSS_H_MODEROM
 #define BOSS_H_MODEROM
 
+#include "../config/boss_item_presets.h"
+#include "../config/bosses.h"
+
 #include <common.h>
 
-typedef enum BossRow
+typedef struct BossItemPreset
 {
-	BOSS_RIPPER_ROO = 0,
-	BOSS_PAPU_PAPU,
-	BOSS_KOMODO_JOE,
-	BOSS_PINSTRIPE,
-	BOSS_NITROS_OXIDE,
-	BOSS_COUNT,
-} BossRow;
+	unsigned short items;
+	unsigned char juice;
+} BossItemPreset;
 
+extern const BossItemPreset bossItemPresets[BOSS_ITEM_PRESET_COUNT];
+extern const char* const bossItemPresetNames[BOSS_ITEM_PRESET_COUNT];
+
+void Boss_InstallStrings();
+const char* Boss_GetName(int boss);
+const char* Boss_GetItemLabel(int boss);
 void Boss_InstallRows();
 void Boss_OpenSelect(struct RectMenu* mainMenu);
 int  Boss_IsRace();

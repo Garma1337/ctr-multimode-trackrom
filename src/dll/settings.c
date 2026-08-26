@@ -1,8 +1,9 @@
+#include "../rom.h"
+#include "boss.h"
 #include "config.h"
 #include "input.h"
 #include "math.h"
 #include "prim.h"
-#include "../rom.h"
 #include "settings.h"
 
 #include <common.h>
@@ -59,15 +60,20 @@ typedef enum FieldKind
 	FIELD_TOGGLE
 } FieldKind;
 
-static const char* const fieldLabels[SETTINGS_FIELD_COUNT] = {
+static const char* const fieldLabels[SETTINGS_BOSS_FIRST] = {
 	"Relic Time - Sapphire",
 	"Relic Time - Gold",
 	"Relic Time - Platinum",
 
 	"Crystal Time Limit",
+	"Ghost Time 1",
+	"Ghost Time 2",
+	"Ghost Character 1",
+	"Ghost Character 2",
 	"Lap Count",
 	"Intro Cutscene",
 	"Time Trial Ghosts",
+	"High Detail Tracks",
 	"CTR Token Color",
 
 	"Freecam",
@@ -84,11 +90,6 @@ static const char* const fieldLabels[SETTINGS_FIELD_COUNT] = {
 	"Mode - CTR Token",
 	"Mode - Boss Race",
 
-	"Boss - Ripper Roo",
-	"Boss - Papu Papu",
-	"Boss - Komodo Joe",
-	"Boss - Pinstripe",
-	"Boss - N. Oxide",
 };
 
 static const unsigned char fieldKinds[SETTINGS_FEATURE_FIRST] = {
@@ -96,7 +97,12 @@ static const unsigned char fieldKinds[SETTINGS_FEATURE_FIRST] = {
 	FIELD_TIME,
 	FIELD_TIME,
 	FIELD_TIME,
+	FIELD_TIME,
+	FIELD_TIME,
+	FIELD_ENUM,
+	FIELD_ENUM,
 	FIELD_LAPS,
+	FIELD_TOGGLE,
 	FIELD_TOGGLE,
 	FIELD_TOGGLE,
 	FIELD_ENUM,
@@ -110,12 +116,47 @@ static const char* const tokenNames[TOKEN_COLOR_COUNT] = {
 	"Purple",
 };
 
-static const char* const* fieldOptions[SETTINGS_FEATURE_FIRST] = {
-	[SETTINGS_CTR_TOKEN] = tokenNames,
+static const char* const characterNames[GHOST_CHARACTER_COUNT] = {
+	"Crash",
+	"Cortex",
+	"Tiny",
+	"Coco",
+	"N. Gin",
+	"Dingodile",
+	"Polar",
+	"Pura",
+	"Pinstripe",
+	"Papu Papu",
+	"Ripper Roo",
+	"Komodo Joe",
+	"N. Tropy",
+	"Penta",
+	"Fake Crash",
+	"N. Oxide",
 };
 
-static const unsigned char fieldOptionCount[SETTINGS_FEATURE_FIRST] = {
+static const char* const* fieldOptions[SETTINGS_FIELD_COUNT] = {
+	[SETTINGS_CTR_TOKEN] = tokenNames,
+	[SETTINGS_GHOST_CHARACTER_1] = characterNames,
+	[SETTINGS_GHOST_CHARACTER_2] = characterNames,
+
+	[SETTINGS_BOSS_ITEM_PRESET_1] = bossItemPresetNames,
+	[SETTINGS_BOSS_ITEM_PRESET_2] = bossItemPresetNames,
+	[SETTINGS_BOSS_ITEM_PRESET_3] = bossItemPresetNames,
+	[SETTINGS_BOSS_ITEM_PRESET_4] = bossItemPresetNames,
+	[SETTINGS_BOSS_ITEM_PRESET_5] = bossItemPresetNames,
+};
+
+static const unsigned char fieldOptionCount[SETTINGS_FIELD_COUNT] = {
 	[SETTINGS_CTR_TOKEN] = TOKEN_COLOR_COUNT,
+	[SETTINGS_GHOST_CHARACTER_1] = GHOST_CHARACTER_COUNT,
+	[SETTINGS_GHOST_CHARACTER_2] = GHOST_CHARACTER_COUNT,
+
+	[SETTINGS_BOSS_ITEM_PRESET_1] = BOSS_ITEM_PRESET_COUNT,
+	[SETTINGS_BOSS_ITEM_PRESET_2] = BOSS_ITEM_PRESET_COUNT,
+	[SETTINGS_BOSS_ITEM_PRESET_3] = BOSS_ITEM_PRESET_COUNT,
+	[SETTINGS_BOSS_ITEM_PRESET_4] = BOSS_ITEM_PRESET_COUNT,
+	[SETTINGS_BOSS_ITEM_PRESET_5] = BOSS_ITEM_PRESET_COUNT,
 };
 
 static int isOpen = 0;
@@ -128,12 +169,34 @@ static int draft[SETTINGS_FIELD_COUNT];
 static unsigned char visibleField[SETTINGS_FIELD_COUNT];
 static int visibleCount = 0;
 static int commitOnClose = 0;
+static int columnLabelWidth = 0;
+static int columnValueWidth = 0;
 static int hostSequence = 0;
 static int hostSeen = 0;
 
+static const char* Settings_GetLabel(int field)
+{
+	if (field < SETTINGS_BOSS_FIRST)
+	{
+		return fieldLabels[field];
+	}
+
+	if (field < SETTINGS_BOSS_END)
+	{
+		return Boss_GetName(field - SETTINGS_BOSS_FIRST);
+	}
+
+	return Boss_GetItemLabel(field - SETTINGS_BOSS_ITEM_PRESET_FIRST);
+}
+
 static int Settings_GetKind(int field)
 {
-	return (field < SETTINGS_FEATURE_FIRST) ? fieldKinds[field] : FIELD_TOGGLE;
+	if (field < SETTINGS_FEATURE_FIRST)
+	{
+		return fieldKinds[field];
+	}
+
+	return (field >= SETTINGS_BOSS_ITEM_PRESET_FIRST) ? FIELD_ENUM : FIELD_TOGGLE;
 }
 
 static int Settings_GetCursorField(void)
@@ -206,10 +269,20 @@ static void Settings_LoadDraft(void)
 	draft[SETTINGS_RELIC_GOLD] = config->relicGold;
 	draft[SETTINGS_RELIC_PLATINUM] = config->relicPlatinum;
 	draft[SETTINGS_CRYSTAL_TIME] = config->crystalTime;
+	draft[SETTINGS_GHOST_TIME_1] = config->ghostTime[0];
+	draft[SETTINGS_GHOST_TIME_2] = config->ghostTime[1];
+	draft[SETTINGS_GHOST_CHARACTER_1] = config->ghostCharacter[0];
+	draft[SETTINGS_GHOST_CHARACTER_2] = config->ghostCharacter[1];
 	draft[SETTINGS_LAPS] = config->laps;
 	draft[SETTINGS_INTRO_CUTSCENE] = (config->introCutscene != 0);
 	draft[SETTINGS_GHOST] = (config->ghosts != 0);
+	draft[SETTINGS_HIGH_LOD] = (config->highLod != 0);
 	draft[SETTINGS_CTR_TOKEN] = config->ctrToken;
+
+	for (int boss = 0; boss < CONFIG_BOSS_COUNT; boss++)
+	{
+		draft[SETTINGS_BOSS_ITEM_PRESET_FIRST + boss] = config->bossItemPreset[boss];
+	}
 
 	Settings_UnpackBits(config->features, SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
 	Settings_UnpackBits(config->modes, SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
@@ -224,10 +297,20 @@ static void Settings_Commit(void)
 	next.relicGold = draft[SETTINGS_RELIC_GOLD];
 	next.relicPlatinum = draft[SETTINGS_RELIC_PLATINUM];
 	next.crystalTime = draft[SETTINGS_CRYSTAL_TIME];
+	next.ghostTime[0] = draft[SETTINGS_GHOST_TIME_1];
+	next.ghostTime[1] = draft[SETTINGS_GHOST_TIME_2];
+	next.ghostCharacter[0] = (unsigned char)draft[SETTINGS_GHOST_CHARACTER_1];
+	next.ghostCharacter[1] = (unsigned char)draft[SETTINGS_GHOST_CHARACTER_2];
 	next.laps = (unsigned char)draft[SETTINGS_LAPS];
 	next.introCutscene = (unsigned char)draft[SETTINGS_INTRO_CUTSCENE];
 	next.ghosts = (unsigned char)draft[SETTINGS_GHOST];
+	next.highLod = (unsigned char)draft[SETTINGS_HIGH_LOD];
 	next.ctrToken = (unsigned char)draft[SETTINGS_CTR_TOKEN];
+
+	for (int boss = 0; boss < CONFIG_BOSS_COUNT; boss++)
+	{
+		next.bossItemPreset[boss] = (unsigned char)draft[SETTINGS_BOSS_ITEM_PRESET_FIRST + boss];
+	}
 
 	next.features = Settings_PackBits(SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
 	next.modes = Settings_PackBits(SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
@@ -236,15 +319,21 @@ static void Settings_Commit(void)
 	Config_Set(&next);
 }
 
+static int Settings_IsFieldEditable(int field)
+{
+	unsigned long long editable = Config_Get()->editable;
+	unsigned int word = (field < 32) ? (unsigned int)editable : (unsigned int)(editable >> 32);
+
+	return (word & (1u << (field & 31))) != 0;
+}
+
 static void Settings_BuildVisibleFields(void)
 {
-	unsigned int editable = Config_Get()->editable;
-
 	visibleCount = 0;
 
 	for (int field = 0; field < SETTINGS_FIELD_COUNT; field++)
 	{
-		if ((editable & (1 << field)) != 0)
+		if (Settings_IsFieldEditable(field))
 		{
 			visibleField[visibleCount++] = (unsigned char)field;
 		}
@@ -359,11 +448,38 @@ static int Settings_CalculateWidestLabel(void)
 
 	for (int i = 0; i < visibleCount; i++)
 	{
-		int width = DecalFont_GetLineWidth((char*)fieldLabels[visibleField[i]], FONT_SMALL);
+		int width = DecalFont_GetLineWidth((char*)Settings_GetLabel(visibleField[i]), FONT_SMALL);
 
 		if (width > widest)
 		{
 			widest = width;
+		}
+	}
+
+	return widest;
+}
+
+static int Settings_CalculateWidestValue(void)
+{
+	int widest = DecalFont_GetLineWidth(VALUE_SAMPLE, FONT_SMALL);
+
+	for (int i = 0; i < visibleCount; i++)
+	{
+		int field = visibleField[i];
+
+		if (Settings_GetKind(field) != FIELD_ENUM)
+		{
+			continue;
+		}
+
+		for (int option = 0; option < fieldOptionCount[field]; option++)
+		{
+			int width = DecalFont_GetLineWidth((char*)fieldOptions[field][option], FONT_SMALL);
+
+			if (width > widest)
+			{
+				widest = width;
+			}
 		}
 	}
 
@@ -376,8 +492,8 @@ static void Settings_Draw(struct GameTracker* gGT)
 
 	int rowsShown = (visibleCount < VISIBLE_ROWS) ? visibleCount : VISIBLE_ROWS;
 
-	int labelWidth = Settings_CalculateWidestLabel();
-	int valueWidth = DecalFont_GetLineWidth(VALUE_SAMPLE, FONT_SMALL);
+	int labelWidth = columnLabelWidth;
+	int valueWidth = columnValueWidth;
 	int confirmWidth = DecalFont_GetLineWidth(HINT_CONFIRM, FONT_SMALL);
 	int backWidth = DecalFont_GetLineWidth(HINT_BACK, FONT_SMALL);
 	int hintWidth = backWidth + COLUMN_GAP + confirmWidth;
@@ -419,7 +535,7 @@ static void Settings_Draw(struct GameTracker* gGT)
 		char value[16];
 		Settings_FormatValue(value, field);
 
-		DecalFont_DrawLineOT((char*)fieldLabels[field], labelX, y, FONT_SMALL, color, ot);
+		DecalFont_DrawLineOT((char*)Settings_GetLabel(field), labelX, y, FONT_SMALL, color, ot);
 		DecalFont_DrawLineOT(value, valueX, y, FONT_SMALL, color | JUSTIFY_RIGHT, ot);
 	}
 
@@ -488,6 +604,9 @@ void Settings_Open(struct RectMenu* mainMenu)
 	}
 
 	Settings_LoadDraft();
+
+	columnLabelWidth = Settings_CalculateWidestLabel();
+	columnValueWidth = Settings_CalculateWidestValue();
 
 	cursor = 0;
 	scroll = 0;
@@ -590,6 +709,11 @@ int Settings_GetRelicTime(int tier)
 int Settings_GetCrystalTime(void)
 {
 	return Settings_CalculateTicksFromMs(Config_Get()->crystalTime);
+}
+
+int Settings_GetGhostTime(int slot)
+{
+	return Settings_CalculateTicksFromMs(Config_Get()->ghostTime[slot]);
 }
 
 int Settings_IsAvailable(void)

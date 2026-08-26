@@ -1,3 +1,4 @@
+#include "ghost.h"
 #include "hot_reload.h"
 #include "../rom.h"
 
@@ -85,7 +86,7 @@ void HotReload_Poll()
 	GhostTape_Destroy();
 	sdata->mainMenuState = MM_STATE_TITLE;
 	gGT->gameMode1 |= MAIN_MENU;
-	data.metaDataLEV[CUSTOM_LEVEL_ID].timeTrial = 0x7FFFFFFF;
+	Ghost_Forget();
 	sdata->gameProgress.highScoreTracks[CUSTOM_LEVEL_ID].timeTrialFlags = 0;
 	MainRaceTrack_RequestLoad(MAIN_MENU_LEVEL);
 }

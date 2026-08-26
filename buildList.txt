@@ -1,8 +1,8 @@
-// Uncomment these lines to ship your own track ROM with your own track
-// common, bigfilelevelstracksproto81Pdatavrm, 0x0, 0x0, src/assets/customtrack.vrm
-// common, bigfilelevelstracksproto81Pdatalev, 0x0, 0x0, src/assets/customtrack.lev
+// Replace src/assets/customtrack.{lev,vrm} with your own track and set BAKED_TRACK to 1 in src/user_config.h
+common, bigfilelevelstracksproto81Pdatavrm, 0x0, 0x0, src/assets/customtrack.vrm
+common, bigfilelevelstracksproto81Pdatalev, 0x0, 0x0, src/assets/customtrack.lev
 
-926, DLL, 0x802C8A00, 0x0, src/dll/prim.c src/dll/math.c src/dll/input.c src/dll/freecam.c src/dll/debug.c src/dll/oxide.c src/dll/reserves.c src/dll/settings.c src/dll/race.c src/dll/hot_reload.c src/dll/boss.c src/dll/main_menu.c src/dll/game_mode.c src/dll/level.c src/dll/config.c, DLL.BIN
+926, DLL, 0x802C8A00, 0x0, src/dll/prim.c src/dll/math.c src/dll/input.c src/dll/freecam.c src/dll/debug.c src/dll/oxide.c src/dll/reserves.c src/dll/settings.c src/dll/race.c src/dll/hot_reload.c src/dll/boss.c src/dll/main_menu.c src/dll/game_mode.c src/dll/level.c src/dll/config.c src/dll/ghost.c src/dll/lod.c, DLL.BIN
 
 926, exe, 0x800844E4, 0x0, src/hooks/exe/pause_menu.c
 926, 224, 0x8009f6fc, 0xD38, src/hooks/ovl224/race_end_rows_save.c
@@ -17,13 +17,6 @@
 
 common, exe, LOAD_Callback_Overlay_231, -0x8, src/patches/hook_callback230.s
 
-926, 226, 0x800a0f18, 0x0, src/patches/lod0.s
-926, 226, 0x800a1e80, 0x0, src/patches/lod1.s
-926, 226, 0x800a36d8, 0x0, src/patches/lod2.s
-926, 226, 0x800a4fd0, 0x0, src/patches/lod3.s
-926, 226, 0x800a6f70, 0x0, src/patches/lod4.s
-926, 226, 0x800a8b90, 0x0, src/patches/lod5.s
-926, 226, 0x800ab460, 0x0, src/patches/high_lod.s
 
 common, 230, MM_MenuProc_Main, 0x0, src/hooks/ovl230/menu_proc.c
 common, 230, MM_TrackSelect_MenuProc, 0x0, src/hooks/ovl230/track_select.c
@@ -40,4 +33,3 @@ common, exe, MEMCARD_Save, 0x0, src/hooks/exe/memcard_save.c
 common, exe, VehBirth_SetConsts, 0x0, src/hooks/exe/engine_stats.c
 
 common, exe, rdata_free, 0x0, src/rom/boot.c src/rom/drivers.c, rom_core
-common, CONFIG, 0x802F0000, 0x0, src/config/config_data.c, CONFIG.BIN
