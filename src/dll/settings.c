@@ -139,12 +139,6 @@ static const char* const* fieldOptions[SETTINGS_FIELD_COUNT] = {
 	[SETTINGS_CTR_TOKEN] = tokenNames,
 	[SETTINGS_GHOST_CHARACTER_1] = characterNames,
 	[SETTINGS_GHOST_CHARACTER_2] = characterNames,
-
-	[SETTINGS_BOSS_ITEM_PRESET_1] = bossItemPresetNames,
-	[SETTINGS_BOSS_ITEM_PRESET_2] = bossItemPresetNames,
-	[SETTINGS_BOSS_ITEM_PRESET_3] = bossItemPresetNames,
-	[SETTINGS_BOSS_ITEM_PRESET_4] = bossItemPresetNames,
-	[SETTINGS_BOSS_ITEM_PRESET_5] = bossItemPresetNames,
 };
 
 static const unsigned char fieldOptionCount[SETTINGS_FIELD_COUNT] = {
@@ -189,6 +183,16 @@ static const char* Settings_GetLabel(int field)
 	return Boss_GetItemLabel(field - SETTINGS_BOSS_ITEM_PRESET_FIRST);
 }
 
+static const char* Settings_GetOptionName(int field, int option)
+{
+	if (field >= SETTINGS_BOSS_ITEM_PRESET_FIRST)
+	{
+		return bossItemPresetRegistry[option].name;
+	}
+
+	return fieldOptions[field][option];
+}
+
 static int Settings_GetKind(int field)
 {
 	if (field < SETTINGS_FEATURE_FIRST)
@@ -229,7 +233,7 @@ static void Settings_FormatValue(char* out, int field)
 		return;
 
 	case FIELD_ENUM:
-		sprintf(out, "%s", fieldOptions[field][draft[field]]);
+		sprintf(out, "%s", Settings_GetOptionName(field, draft[field]));
 		return;
 
 	case FIELD_TOGGLE:
@@ -474,7 +478,7 @@ static int Settings_CalculateWidestValue(void)
 
 		for (int option = 0; option < fieldOptionCount[field]; option++)
 		{
-			int width = DecalFont_GetLineWidth((char*)fieldOptions[field][option], FONT_SMALL);
+			int width = DecalFont_GetLineWidth((char*)Settings_GetOptionName(field, option), FONT_SMALL);
 
 			if (width > widest)
 			{

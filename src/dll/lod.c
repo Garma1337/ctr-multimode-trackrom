@@ -16,12 +16,12 @@ static unsigned long* const lodMaskAt[LOD_MASK_SITES] =
 	(unsigned long*)0x800A8B90,
 };
 
-#define LOD_MASK_STOCK 0x312901FCUL // andi $t1, $t1, 0x1FC
-#define LOD_MASK_HIGH  0x3129FFFCUL // andi $t1, $t1, 0xFFFC
+#define LOD_MASK_VANILLA 0x312901FCUL // andi $t1, $t1, 0x1FC
+#define LOD_MASK_HIGH    0x3129FFFCUL // andi $t1, $t1, 0xFFFC
 
-#define LOD_TABLE_AT    ((unsigned long*)0x800AB460)
-#define LOD_TABLE_STOCK 0x800A0EF4UL
-#define LOD_TABLE_HIGH  0x800A6F40UL
+#define LOD_TABLE_AT      ((unsigned long*)0x800AB460)
+#define LOD_TABLE_VANILLA 0x800A0EF4UL
+#define LOD_TABLE_HIGH    0x800A6F40UL
 
 void Lod_Apply(void)
 {
@@ -36,10 +36,10 @@ void Lod_Apply(void)
 
 	for (int i = 0; i < LOD_MASK_SITES; i++)
 	{
-		*lodMaskAt[i] = high ? LOD_MASK_HIGH : LOD_MASK_STOCK;
+		*lodMaskAt[i] = high ? LOD_MASK_HIGH : LOD_MASK_VANILLA;
 	}
 
-	*LOD_TABLE_AT = high ? LOD_TABLE_HIGH : LOD_TABLE_STOCK;
+	*LOD_TABLE_AT = high ? LOD_TABLE_HIGH : LOD_TABLE_VANILLA;
 
 	FlushCache();
 }

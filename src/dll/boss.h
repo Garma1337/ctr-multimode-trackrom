@@ -6,14 +6,22 @@
 
 #include <common.h>
 
-typedef struct BossItemPreset
+typedef struct BossItemPresetDefinition
 {
+	const char* name;
 	unsigned short items;
 	unsigned char juice;
-} BossItemPreset;
+} BossItemPresetDefinition;
 
-extern const BossItemPreset bossItemPresets[BOSS_ITEM_PRESET_COUNT];
-extern const char* const bossItemPresetNames[BOSS_ITEM_PRESET_COUNT];
+typedef struct BossDefinition
+{
+	const char* name;
+	const char* itemLabel;
+	unsigned char character;
+	struct MetaDataBOSS* vanillaItems;
+} BossDefinition;
+
+extern const BossItemPresetDefinition bossItemPresetRegistry[BOSS_ITEM_PRESET_COUNT];
 
 void Boss_InstallStrings();
 const char* Boss_GetName(int boss);

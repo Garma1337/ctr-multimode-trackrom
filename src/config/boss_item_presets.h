@@ -11,7 +11,7 @@
 	X(BOMBS,      "Bombs",            BOSS_ITEM_BOMB,                                                                    BOSS_JUICE_VANILLA) \
 	X(POTIONS,    "Beakers",          BOSS_ITEM_BEAKER,                                                                  BOSS_JUICE_VANILLA) \
 	X(MISSILES,   "Missiles",         BOSS_ITEM_MISSILE,                                                                 BOSS_JUICE_NONE) \
-	X(CLASSIC,    "Classic",          BOSS_ITEM_TNT | BOSS_ITEM_BEAKER | BOSS_ITEM_BOMB,                                   BOSS_JUICE_RANDOM) \
+	X(CLASSIC,    "Classic",          BOSS_ITEM_TNT | BOSS_ITEM_BEAKER | BOSS_ITEM_BOMB,                                 BOSS_JUICE_RANDOM) \
 	X(CHAOS,      "Ruthless",         BOSS_ITEM_MISSILE | BOSS_ITEM_WARP_ORB | BOSS_ITEM_CLOCK | BOSS_ITEM_INVISIBILITY, BOSS_JUICE_ALWAYS) \
     X(ANNOYING,   "Annoying",         BOSS_ITEM_TNT | BOSS_ITEM_BEAKER | BOSS_ITEM_MASK,                                 BOSS_JUICE_ALWAYS)
 #endif

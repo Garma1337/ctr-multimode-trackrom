@@ -45,24 +45,12 @@ static const unsigned char itemCode[BOSS_ITEM_COUNT] =
 	ITEM_SUPER_ENGINE,
 };
 
-#define X(id, name, items, juice) { items, juice },
-const BossItemPreset bossItemPresets[BOSS_ITEM_PRESET_COUNT] = { BOSS_ITEM_PRESET_LIST(X) };
+#define X(id, name, items, juice) { name, items, juice },
+const BossItemPresetDefinition bossItemPresetRegistry[BOSS_ITEM_PRESET_COUNT] = { BOSS_ITEM_PRESET_LIST(X) };
 #undef X
 
-#define X(id, name, items, juice) name,
-const char* const bossItemPresetNames[BOSS_ITEM_PRESET_COUNT] = { BOSS_ITEM_PRESET_LIST(X) };
-#undef X
-
-#define X(slot, name, character, vanillaItems) character,
-static const unsigned char bossCharacter[BOSS_COUNT] = { BOSS_LIST(X) };
-#undef X
-
-#define X(slot, name, character, vanillaItems) name,
-static const char* const bossName[BOSS_COUNT] = { BOSS_LIST(X) };
-#undef X
-
-#define X(slot, name, character, vanillaItems) "Items - " name,
-static const char* const bossItemLabel[BOSS_COUNT] = { BOSS_LIST(X) };
+#define X(slot, name, character, vanillaItems) { name, "Items - " name, character, &data.vanillaItems[0] },
+static const BossDefinition bossRegistry[BOSS_COUNT] = { BOSS_LIST(X) };
 #undef X
 
 static const unsigned char vanillaBossCharacter[BOSS_COUNT] =
@@ -77,15 +65,6 @@ static const unsigned char vanillaBossCharacter[BOSS_COUNT] =
 static short Boss_GetStringIndex(int boss)
 {
 	return data.MetaDataCharacters[vanillaBossCharacter[boss]].name_LNG_long;
-}
-
-static struct MetaDataBOSS* Boss_GetVanillaItemSets(int boss)
-{
-#define X(slot, name, character, vanillaItems) &data.vanillaItems[0],
-	struct MetaDataBOSS* tables[BOSS_COUNT] = { BOSS_LIST(X) };
-#undef X
-
-	return tables[boss];
 }
 
 static void Boss_RestoreDefaultItemSets()
@@ -130,7 +109,7 @@ static void Boss_BuildItemSets(struct MetaDataBOSS* vanilla, int count, int numC
 
 static void Boss_ApplyConfiguredItems(int boss, int count)
 {
-	const BossItemPreset* preset = &bossItemPresets[Config_Get()->bossItemPreset[boss]];
+	const BossItemPresetDefinition* preset = &bossItemPresetRegistry[Config_Get()->bossItemPreset[boss]];
 
 	int mask = preset->items;
 	int juice = preset->juice;
@@ -192,19 +171,19 @@ static void Boss_MenuProc(struct RectMenu* menu)
 
 const char* Boss_GetName(int boss)
 {
-	return bossName[boss];
+	return bossRegistry[boss].name;
 }
 
 const char* Boss_GetItemLabel(int boss)
 {
-	return bossItemLabel[boss];
+	return bossRegistry[boss].itemLabel;
 }
 
 void Boss_InstallStrings()
 {
 	for (int boss = 0; boss < BOSS_COUNT; boss++)
 	{
-		sdata->lngStrings[Boss_GetStringIndex(boss)] = (char*)bossName[boss];
+		sdata->lngStrings[Boss_GetStringIndex(boss)] = (char*)bossRegistry[boss].name;
 	}
 }
 
@@ -258,7 +237,7 @@ int Boss_IsRace()
 
 void Boss_ApplyDrivers()
 {
-	data.characterIDs[1] = (char)bossCharacter[selectedBoss];
+	data.characterIDs[1] = (char)bossRegistry[selectedBoss].character;
 }
 
 void Boss_PrepareRace()
@@ -271,7 +250,7 @@ void Boss_PrepareRace()
 		return;
 	}
 
-	struct MetaDataBOSS* vanilla = Boss_GetVanillaItemSets(selectedBoss);
+	struct MetaDataBOSS* vanilla = bossRegistry[selectedBoss].vanillaItems;
 	int count = Boss_CountItemSets(vanilla);
 
 	if ((count == 0) || (gGT->level1 == 0) || (gGT->level1->cnt_restart_points <= 0))
