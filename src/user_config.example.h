@@ -29,10 +29,21 @@
 
 // #define CFG_FEATURES FEATURE_MAX_STATS
 
+// === Boss slots ===
+
+// #define CFG_BOSS_CHARACTER_1 TINY_TIGER
+// #define CFG_BOSS_CHARACTER_5 N_GIN
+
+// #define BOSS_LIST(X) \
+// 	X(1, "Big Norm",   BossWeaponRoo)       \
+// 	X(2, "Papu Papu",  BossWeaponPapu)      \
+// 	X(3, "Komodo Joe", BossWeaponJoe)       \
+// 	X(4, "Pinstripe",  BossWeaponPinstripe) \
+// 	X(5, "The Doctor", BossWeaponOxide)
+
 // === Boss item presets ===
 
-// Replacing the list replaces it entirely; the first entry is what an
-// unconfigured boss uses, so keep a sane one there.
+// Replacing the list replaces it entirely; the first entry is what an unconfigured boss uses, so keep a sane one there.
 // #define BOSS_ITEM_PRESET_LIST(X) \
 // 	X(VANILLA,  "Vanilla",  BOSS_ITEMS_VANILLA,                       BOSS_JUICE_VANILLA) \
 // 	X(NASTY,  "Nasty",  BOSS_ITEM_MISSILE | BOSS_ITEM_WARP_ORB, BOSS_JUICE_NONE)

@@ -135,6 +135,28 @@ static const char* const characterNames[GHOST_CHARACTER_COUNT] = {
 	"N. Oxide",
 };
 
+static const char* const bossRowLabel[SETTINGS_BOSS_END - SETTINGS_BOSS_FIRST] = {
+	"Boss 1 Enabled",
+	"Boss 1 Character",
+	"Boss 1 Item Preset",
+
+	"Boss 2 Enabled",
+	"Boss 2 Character",
+	"Boss 2 Item Preset",
+
+	"Boss 3 Enabled",
+	"Boss 3 Character",
+	"Boss 3 Item Preset",
+
+	"Boss 4 Enabled",
+	"Boss 4 Character",
+	"Boss 4 Item Preset",
+
+	"Boss 5 Enabled",
+	"Boss 5 Character",
+	"Boss 5 Item Preset",
+};
+
 static const char* const* fieldOptions[SETTINGS_FIELD_COUNT] = {
 	[SETTINGS_CTR_TOKEN] = tokenNames,
 	[SETTINGS_GHOST_CHARACTER_1] = characterNames,
@@ -145,12 +167,6 @@ static const unsigned char fieldOptionCount[SETTINGS_FIELD_COUNT] = {
 	[SETTINGS_CTR_TOKEN] = TOKEN_COLOR_COUNT,
 	[SETTINGS_GHOST_CHARACTER_1] = GHOST_CHARACTER_COUNT,
 	[SETTINGS_GHOST_CHARACTER_2] = GHOST_CHARACTER_COUNT,
-
-	[SETTINGS_BOSS_ITEM_PRESET_1] = BOSS_ITEM_PRESET_COUNT,
-	[SETTINGS_BOSS_ITEM_PRESET_2] = BOSS_ITEM_PRESET_COUNT,
-	[SETTINGS_BOSS_ITEM_PRESET_3] = BOSS_ITEM_PRESET_COUNT,
-	[SETTINGS_BOSS_ITEM_PRESET_4] = BOSS_ITEM_PRESET_COUNT,
-	[SETTINGS_BOSS_ITEM_PRESET_5] = BOSS_ITEM_PRESET_COUNT,
 };
 
 static int isOpen = 0;
@@ -175,23 +191,47 @@ static const char* Settings_GetLabel(int field)
 		return fieldLabels[field];
 	}
 
-	if (field < SETTINGS_BOSS_END)
+	return bossRowLabel[field - SETTINGS_BOSS_FIRST];
+}
+
+static int Settings_GetBossRow(int field)
+{
+	if (field < SETTINGS_BOSS_FIRST)
 	{
-		return Boss_GetName(field - SETTINGS_BOSS_FIRST);
+		return -1;
 	}
 
-	return Boss_GetItemLabel(field - SETTINGS_BOSS_ITEM_PRESET_FIRST);
+	return (field - SETTINGS_BOSS_FIRST) % SETTINGS_BOSS_ROW_COUNT;
 }
 
 static const char* Settings_GetOptionName(int field, int option)
 {
-	if (field >= SETTINGS_BOSS_ITEM_PRESET_FIRST)
+	switch (Settings_GetBossRow(field))
 	{
+	case SETTINGS_BOSS_ROW_CHARACTER:
+		return characterNames[option];
+
+	case SETTINGS_BOSS_ROW_ITEM_PRESET:
 		return bossItemPresetRegistry[option].name;
 	}
 
 	return fieldOptions[field][option];
 }
+
+static int Settings_GetOptionCount(int field)
+{
+	switch (Settings_GetBossRow(field))
+	{
+	case SETTINGS_BOSS_ROW_CHARACTER:
+		return DRIVER_COUNT;
+
+	case SETTINGS_BOSS_ROW_ITEM_PRESET:
+		return BOSS_ITEM_PRESET_COUNT;
+	}
+
+	return fieldOptionCount[field];
+}
+
 
 static int Settings_GetKind(int field)
 {
@@ -200,7 +240,14 @@ static int Settings_GetKind(int field)
 		return fieldKinds[field];
 	}
 
-	return (field >= SETTINGS_BOSS_ITEM_PRESET_FIRST) ? FIELD_ENUM : FIELD_TOGGLE;
+	switch (Settings_GetBossRow(field))
+	{
+	case SETTINGS_BOSS_ROW_CHARACTER:
+	case SETTINGS_BOSS_ROW_ITEM_PRESET:
+		return FIELD_ENUM;
+	}
+
+	return FIELD_TOGGLE;
 }
 
 static int Settings_GetCursorField(void)
@@ -285,12 +332,15 @@ static void Settings_LoadDraft(void)
 
 	for (int boss = 0; boss < CONFIG_BOSS_COUNT; boss++)
 	{
-		draft[SETTINGS_BOSS_ITEM_PRESET_FIRST + boss] = config->bossItemPreset[boss];
+		int row = SETTINGS_BOSS_FIRST + boss * SETTINGS_BOSS_ROW_COUNT;
+
+		draft[row + SETTINGS_BOSS_ROW_ENABLED] = (config->bosses & (1 << boss)) != 0;
+		draft[row + SETTINGS_BOSS_ROW_CHARACTER] = config->bossCharacter[boss];
+		draft[row + SETTINGS_BOSS_ROW_ITEM_PRESET] = config->bossItemPreset[boss];
 	}
 
 	Settings_UnpackBits(config->features, SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
 	Settings_UnpackBits(config->modes, SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
-	Settings_UnpackBits(config->bosses, SETTINGS_BOSS_FIRST, SETTINGS_BOSS_END);
 }
 
 static void Settings_Commit(void)
@@ -311,14 +361,23 @@ static void Settings_Commit(void)
 	next.highLod = (unsigned char)draft[SETTINGS_HIGH_LOD];
 	next.ctrToken = (unsigned char)draft[SETTINGS_CTR_TOKEN];
 
+	next.bosses = 0;
+
 	for (int boss = 0; boss < CONFIG_BOSS_COUNT; boss++)
 	{
-		next.bossItemPreset[boss] = (unsigned char)draft[SETTINGS_BOSS_ITEM_PRESET_FIRST + boss];
+		int row = SETTINGS_BOSS_FIRST + boss * SETTINGS_BOSS_ROW_COUNT;
+
+		if (draft[row + SETTINGS_BOSS_ROW_ENABLED])
+		{
+			next.bosses |= 1 << boss;
+		}
+
+		next.bossCharacter[boss] = (unsigned char)draft[row + SETTINGS_BOSS_ROW_CHARACTER];
+		next.bossItemPreset[boss] = (unsigned char)draft[row + SETTINGS_BOSS_ROW_ITEM_PRESET];
 	}
 
 	next.features = Settings_PackBits(SETTINGS_FEATURE_FIRST, SETTINGS_FEATURE_END);
 	next.modes = Settings_PackBits(SETTINGS_MODE_FIRST, SETTINGS_MODE_END);
-	next.bosses = (unsigned char)Settings_PackBits(SETTINGS_BOSS_FIRST, SETTINGS_BOSS_END);
 
 	Config_Set(&next);
 }
@@ -373,7 +432,7 @@ static void Settings_Adjust(int delta)
 		return;
 
 	case FIELD_ENUM:
-		draft[field] = Math_Wrap(draft[field] + ((delta > 0) ? 1 : -1), fieldOptionCount[field]);
+		draft[field] = Math_Wrap(draft[field] + ((delta > 0) ? 1 : -1), Settings_GetOptionCount(field));
 		return;
 
 	case FIELD_TOGGLE:
@@ -476,7 +535,7 @@ static int Settings_CalculateWidestValue(void)
 			continue;
 		}
 
-		for (int option = 0; option < fieldOptionCount[field]; option++)
+		for (int option = 0; option < Settings_GetOptionCount(field); option++)
 		{
 			int width = DecalFont_GetLineWidth((char*)Settings_GetOptionName(field, option), FONT_SMALL);
 

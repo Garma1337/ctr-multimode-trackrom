@@ -29,17 +29,17 @@ Write `HostSettings` at `0x8000C080`, little-endian:
 | `0x04` | `sequence` | change this on every push                          |
 | `0x08` | `config`   | a complete `Config`, laid out by `config_schema.h` |
 
-The payload is the same struct `CONFIG.BIN` holds, so **anything that can be baked can be pushed**: relic and crystal times, lap count, token color, every feature flag, which modes appear, which bosses appear, and the `editable` mask. There is no second list of pushable fields to keep in step — include `src/config_schema.h` on the editor side and fill it in.
+The payload is the ROM's whole config, so anything that can be built in can be pushed: relic and crystal times, lap count, token color, every feature flag, which modes appear, which bosses appear, and the `editable` mask. There is no second list of pushable fields to keep in step — include `src/config/config_schema.h` on the editor side and fill it in.
 
 Times are milliseconds, so 1 second is `1000` and 1:17.0 is `77000`. Valid range is 500 to 599500 and anything outside it is clamped. Values that are not a multiple of 500 work, they just will not line up with the panel's half-second steps.
 
-Fill in the config's own `magic`, `version` and `size` as well as the outer ones. The ROM ignores a push whose config fails the same validation `CONFIG.BIN` gets, so a stale or half-written block cannot be applied.
+Fill in the config's own `magic`, `version` and `size` as well as the outer ones. The ROM checks `magic`, `version` and `size` before applying a push, so a stale or half-written block cannot be applied.
 
 **Write the payload first and `sequence` last.** The ROM latches on `sequence` changing, so writing it early lets a half-finished block be read.
 
 Three things to get right:
 
-- **A push replaces the whole config**, not just the fields you care about. Sending a default-constructed struct silently resets modes, features and the editable mask. Seed it from the ROM's `CONFIG.BIN` — which the editor can read out of the ISO it is working with — and change what you need.
+- **A push replaces the whole config**, not just the fields you care about. Sending a default-constructed struct silently resets modes, features and the editable mask. Seed it from the values the ROM reports, or from the mod's `src/user_config.h` and `src/config/config_default.h`, and change what you need.
 - **`sequence` must differ from the previous push, including across editor restarts.** The ROM only compares for inequality, so wrap-around and resets are fine — but a counter starting at 0 on every launch will have its first push ignored if the ROM last saw 0. Seed it from a timestamp or persist it.
 - **Send the time fields as signed 32-bit.** A value with the top bit set reads as negative and clamps to the *minimum*, which looks like "the push never arrived" rather than an obvious error.
 

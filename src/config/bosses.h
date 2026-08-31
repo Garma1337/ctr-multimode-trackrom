@@ -8,14 +8,14 @@
 
 #ifndef BOSS_LIST
 #define BOSS_LIST(X) \
-	X(1, "Ripper Roo", RIPPER_ROO,   BossWeaponRoo)       \
-	X(2, "Papu Papu",  PAPU_PAPU,    BossWeaponPapu)      \
-	X(3, "Komodo Joe", KOMODO_JOE,   BossWeaponJoe)       \
-	X(4, "Pinstripe",  PINSTRIPE,    BossWeaponPinstripe) \
-	X(5, "N. Oxide",   NITROS_OXIDE, BossWeaponOxide)
+	X(1, "Ripper Roo", BossWeaponRoo)       \
+	X(2, "Papu Papu",  BossWeaponPapu)      \
+	X(3, "Komodo Joe", BossWeaponJoe)       \
+	X(4, "Pinstripe",  BossWeaponPinstripe) \
+	X(5, "N. Oxide",   BossWeaponOxide)
 #endif
 
-#define X(slot, name, character, vanillaItems) BOSS_##slot,
+#define X(slot, name, vanillaItems) BOSS_##slot,
 typedef enum BossSlot
 {
 	BOSS_LIST(X)

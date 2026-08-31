@@ -27,9 +27,10 @@ _Static_assert(OPTION_GHOST == (1ULL << SETTINGS_GHOST), "setting option bits dr
 _Static_assert(OPTION_HIGH_LOD == (1ULL << SETTINGS_HIGH_LOD), "setting option bits drifted");
 _Static_assert(OPTION_FREECAM == (1ULL << SETTINGS_FREECAM), "setting option bits drifted");
 _Static_assert(OPTION_MODE_ARCADE == (1ULL << SETTINGS_MODE_ARCADE), "setting option bits drifted");
-_Static_assert(OPTION_BOSS_5 == (1ULL << SETTINGS_BOSS_5), "setting option bits drifted");
-_Static_assert(OPTION_BOSS_ITEM_PRESET_1 == (1ULL << SETTINGS_BOSS_ITEM_PRESET_1), "setting option bits drifted");
-_Static_assert(OPTION_BOSS_ITEM_PRESET_5 == (1ULL << SETTINGS_BOSS_ITEM_PRESET_5), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_1_ENABLED == (1ULL << SETTINGS_BOSS_1_ENABLED), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_1_CHARACTER == (1ULL << SETTINGS_BOSS_1_CHARACTER), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_1_ITEM_PRESET == (1ULL << SETTINGS_BOSS_1_ITEM_PRESET), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_5_ITEM_PRESET == (1ULL << SETTINGS_BOSS_5_ITEM_PRESET), "setting option bits drifted");
 _Static_assert(OPTION_ALL == ((1ULL << SETTINGS_FIELD_COUNT) - 1), "option mask does not cover every field");
 _Static_assert(CONFIG_BOSS_COUNT == BOSS_COUNT, "boss count drifted");
 
@@ -37,7 +38,7 @@ _Static_assert(FEATURE_FREECAM == (1 << (SETTINGS_FREECAM - SETTINGS_FEATURE_FIR
 _Static_assert(FEATURE_HOST_SETTINGS == (1 << (SETTINGS_HOST_SETTINGS - SETTINGS_FEATURE_FIRST)), "feature run drifted");
 _Static_assert(FEATURE_MAX_STATS == (1 << (SETTINGS_MAX_STATS - SETTINGS_FEATURE_FIRST)), "feature run drifted");
 _Static_assert(CONFIG_MODE_BOSS_RACE == (1 << (SETTINGS_MODE_BOSS_RACE - SETTINGS_MODE_FIRST)), "mode run drifted");
-_Static_assert(CONFIG_BOSS_5 == (1 << (SETTINGS_BOSS_5 - SETTINGS_BOSS_FIRST)), "boss run drifted");
+_Static_assert(SETTINGS_BOSS_END - SETTINGS_BOSS_FIRST == CONFIG_BOSS_COUNT * SETTINGS_BOSS_ROW_COUNT, "boss run drifted");
 
 _Static_assert(CONFIG_BOSS_1 == (1 << BOSS_1), "boss bits drifted");
 _Static_assert(CONFIG_BOSS_5 == (1 << BOSS_5), "boss bits drifted");
@@ -45,6 +46,14 @@ _Static_assert(CONFIG_BOSS_5 == (1 << BOSS_5), "boss bits drifted");
 static const unsigned char ghostCharacterDefault[GHOST_SLOT_COUNT] = {
 	GHOST_CHARACTER_1_DEFAULT,
 	GHOST_CHARACTER_2_DEFAULT,
+};
+
+static const unsigned char bossCharacterDefault[CONFIG_BOSS_COUNT] = {
+	BOSS_CHARACTER_1_DEFAULT,
+	BOSS_CHARACTER_2_DEFAULT,
+	BOSS_CHARACTER_3_DEFAULT,
+	BOSS_CHARACTER_4_DEFAULT,
+	BOSS_CHARACTER_5_DEFAULT,
 };
 
 static Config config = CONFIG_DEFAULTS;
@@ -79,6 +88,11 @@ void Config_Normalize(Config* config)
 
 	for (int boss = 0; boss < CONFIG_BOSS_COUNT; boss++)
 	{
+		if (config->bossCharacter[boss] >= DRIVER_COUNT)
+		{
+			config->bossCharacter[boss] = bossCharacterDefault[boss];
+		}
+
 		if (config->bossItemPreset[boss] >= BOSS_ITEM_PRESET_COUNT)
 		{
 			config->bossItemPreset[boss] = 0;

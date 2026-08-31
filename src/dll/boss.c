@@ -49,7 +49,7 @@ static const unsigned char itemCode[BOSS_ITEM_COUNT] =
 const BossItemPresetDefinition bossItemPresetRegistry[BOSS_ITEM_PRESET_COUNT] = { BOSS_ITEM_PRESET_LIST(X) };
 #undef X
 
-#define X(slot, name, character, vanillaItems) { name, "Items - " name, character, &data.vanillaItems[0] },
+#define X(slot, name, vanillaItems) { name, &data.vanillaItems[0] },
 static const BossDefinition bossRegistry[BOSS_COUNT] = { BOSS_LIST(X) };
 #undef X
 
@@ -174,11 +174,6 @@ const char* Boss_GetName(int boss)
 	return bossRegistry[boss].name;
 }
 
-const char* Boss_GetItemLabel(int boss)
-{
-	return bossRegistry[boss].itemLabel;
-}
-
 void Boss_InstallStrings()
 {
 	for (int boss = 0; boss < BOSS_COUNT; boss++)
@@ -237,7 +232,7 @@ int Boss_IsRace()
 
 void Boss_ApplyDrivers()
 {
-	data.characterIDs[1] = (char)bossRegistry[selectedBoss].character;
+	data.characterIDs[1] = (char)Config_Get()->bossCharacter[selectedBoss];
 }
 
 void Boss_PrepareRace()

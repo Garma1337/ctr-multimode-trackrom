@@ -2,16 +2,23 @@
 #define CONFIG_H
 
 #define CONFIG_MAGIC 0x4746434D // 'MCFG'
-#define CONFIG_VERSION 2
+#define CONFIG_VERSION 3
 #define CONFIG_LAPS_MIN 1
 #define CONFIG_LAPS_MAX 7
 #define CONFIG_MIN_SIZE 8
 
 #define GHOST_SLOT_COUNT 2
-#define GHOST_CHARACTER_COUNT 16
+#define DRIVER_COUNT 16
+#define GHOST_CHARACTER_COUNT DRIVER_COUNT
 
 #define GHOST_CHARACTER_1_DEFAULT 12 // N. Tropy
 #define GHOST_CHARACTER_2_DEFAULT 15 // Oxide
+
+#define BOSS_CHARACTER_1_DEFAULT 10 // Ripper Roo
+#define BOSS_CHARACTER_2_DEFAULT  9 // Papu Papu
+#define BOSS_CHARACTER_3_DEFAULT 11 // Komodo Joe
+#define BOSS_CHARACTER_4_DEFAULT  8 // Pinstripe
+#define BOSS_CHARACTER_5_DEFAULT 15 // Oxide
 
 typedef enum FeatureFlag
 {
@@ -64,19 +71,26 @@ typedef enum ModeFlag
 #define OPTION_MODE_CTR_TOKEN    (1ULL << 23)
 #define OPTION_MODE_BOSS_RACE    (1ULL << 24)
 
-#define OPTION_BOSS_1            (1ULL << 25)
-#define OPTION_BOSS_2            (1ULL << 26)
-#define OPTION_BOSS_3            (1ULL << 27)
-#define OPTION_BOSS_4            (1ULL << 28)
-#define OPTION_BOSS_5            (1ULL << 29)
+#define OPTION_BOSS_1_ENABLED     (1ULL << 25)
+#define OPTION_BOSS_1_CHARACTER   (1ULL << 26)
+#define OPTION_BOSS_1_ITEM_PRESET (1ULL << 27)
 
-#define OPTION_BOSS_ITEM_PRESET_1 (1ULL << 30)
-#define OPTION_BOSS_ITEM_PRESET_2 (1ULL << 31)
-#define OPTION_BOSS_ITEM_PRESET_3 (1ULL << 32)
-#define OPTION_BOSS_ITEM_PRESET_4 (1ULL << 33)
-#define OPTION_BOSS_ITEM_PRESET_5 (1ULL << 34)
+#define OPTION_BOSS_2_ENABLED     (1ULL << 28)
+#define OPTION_BOSS_2_CHARACTER   (1ULL << 29)
+#define OPTION_BOSS_2_ITEM_PRESET (1ULL << 30)
 
-#define OPTION_ALL 0x7FFFFFFFFULL
+#define OPTION_BOSS_3_ENABLED     (1ULL << 31)
+#define OPTION_BOSS_3_CHARACTER   (1ULL << 32)
+#define OPTION_BOSS_3_ITEM_PRESET (1ULL << 33)
+
+#define OPTION_BOSS_4_ENABLED     (1ULL << 34)
+#define OPTION_BOSS_4_CHARACTER   (1ULL << 35)
+#define OPTION_BOSS_4_ITEM_PRESET (1ULL << 36)
+
+#define OPTION_BOSS_5_ENABLED     (1ULL << 37)
+#define OPTION_BOSS_5_CHARACTER   (1ULL << 38)
+#define OPTION_BOSS_5_ITEM_PRESET (1ULL << 39)
+#define OPTION_ALL 0xFFFFFFFFFFULL
 
 typedef enum TokenColor
 {
@@ -148,13 +162,14 @@ typedef struct Config
 	unsigned char bosses;
 	unsigned char ctrToken; // TokenColor
 	unsigned char ghostCharacter[GHOST_SLOT_COUNT];
+	unsigned char bossCharacter[CONFIG_BOSS_COUNT];
 	unsigned char bossItemPreset[CONFIG_BOSS_COUNT]; // index into BOSS_ITEM_PRESET_LIST
 } Config;
 
 #if defined(__cplusplus)
-static_assert(sizeof(Config) == 64, "Config layout changed; bump CONFIG_VERSION and rebuild the editor");
+static_assert(sizeof(Config) == 72, "Config layout changed; bump CONFIG_VERSION and rebuild the editor");
 #else
-_Static_assert(sizeof(Config) == 64, "Config layout changed; bump CONFIG_VERSION and rebuild the editor");
+_Static_assert(sizeof(Config) == 72, "Config layout changed; bump CONFIG_VERSION and rebuild the editor");
 #endif
 
 #endif
