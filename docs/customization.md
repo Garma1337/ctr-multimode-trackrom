@@ -231,7 +231,7 @@ That is a complete, valid override file. Three things to know:
 - **`|` means "and also".** `CONFIG_MODE_TIME_TRIAL | CONFIG_MODE_RELIC_RACE` is "time trial and relic race". Anything you leave out is off.
 - **Times are in milliseconds.** 1 second is `1000`, so `77000` is 1:17.0.
 
-`BAKED_TRACK` and `CUSTOM_LEVEL_ID` go in the same file even though they live in `rom.h` rather than the config struct.
+`BAKED_TRACK` and `CUSTOM_LEVEL_ID` go in this same file. They are not part of the config struct — `src/rom.h` declares them with an `#ifndef` default, the way `config_default.h` does for the `CFG_*` names — but you override them in exactly the same place, and you should no more edit `rom.h` than `config_default.h`.
 
 The value names you can use, and where each set is defined:
 
@@ -406,9 +406,9 @@ common, bigfilelevelstracksproto81Pdatalev, 0x0, 0x0, src/assets/customtrack.lev
 
 These write your files over Dingo Canyon's bigfile entries. The bigfile is repacked afterwards, so your files may be larger than the originals. To take over a different level instead, see [Overriding a different level](#overriding-a-different-level).
 
-**3. Set `BAKED_TRACK` to `1` in `src/rom.h`.** Without it the ROM keeps falling back to Crash Cove no matter what is on the disc.
+**3. Add `#define BAKED_TRACK 1` to `src/user_config.h`.** Without it the ROM keeps falling back to Crash Cove no matter what is on the disc. `src/rom.h` only carries the `0` fallback for when you have not set it — do not edit it there, it is tracked.
 
-**4. Put the modes, times and features you want to ship in `src/user_config.h`** and rebuild.
+**4. Put the modes, times and features you want to ship in the same file** and rebuild.
 
 **5. Rebuild, then xdelta the resulting ISO** against a clean one.
 
@@ -423,7 +423,7 @@ An editor push still overrides a baked track while the editor is attached, so yo
 
 ### Overriding a different level
 
-The custom track takes over a vanilla level slot, `CUSTOM_LEVEL_ID` in `src/rom.h`, which defaults to `0` — Dingo Canyon. Everything else derives from it, so changing that one define moves the whole ROM to another slot.
+The custom track takes over a vanilla level slot, `CUSTOM_LEVEL_ID`, which defaults to `0` — Dingo Canyon. Everything else derives from it, so overriding that one define moves the whole ROM to another slot.
 
 You would do this because a custom track inherits the slot's metadata, and some of it is not configurable:
 
@@ -436,7 +436,7 @@ You would do this because a custom track inherits the slot's metadata, and some 
 
 The ROM already overrides the two that matter most — the token color comes from your config, and the N. Tropy ghost time can be disabled. The music, ambience and bot tuning are currently the reason to move the slot.
 
-**1. Change the define** in `src/rom.h`:
+**1. Override the define** in `src/user_config.h`:
 
 ```c
 #define CUSTOM_LEVEL_ID 12   // POLAR_PASS
