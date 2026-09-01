@@ -42,54 +42,58 @@ typedef enum ModeFlag
 	CONFIG_MODE_ALL = 0x3F,
 } ModeFlag;
 
-#define OPTION_RELIC_SAPPHIRE    (1ULL << 0)
-#define OPTION_RELIC_GOLD        (1ULL << 1)
-#define OPTION_RELIC_PLATINUM    (1ULL << 2)
-#define OPTION_CRYSTAL_TIME      (1ULL << 3)
-#define OPTION_GHOST_TIME_1      (1ULL << 4)
-#define OPTION_GHOST_TIME_2      (1ULL << 5)
-#define OPTION_GHOST_CHARACTER_1 (1ULL << 6)
-#define OPTION_GHOST_CHARACTER_2 (1ULL << 7)
-#define OPTION_LAPS              (1ULL << 8)
-#define OPTION_INTRO_CUTSCENE    (1ULL << 9)
-#define OPTION_GHOST             (1ULL << 10)
-#define OPTION_HIGH_LOD          (1ULL << 11)
+#define OPTION_MODE_ARCADE            (1ULL << 0)
+#define OPTION_MODE_RELIC_RACE        (1ULL << 1)
+#define OPTION_MODE_TIME_TRIAL        (1ULL << 2)
+#define OPTION_MODE_CRYSTAL_CHALLENGE (1ULL << 3)
+#define OPTION_MODE_CTR_TOKEN         (1ULL << 4)
+#define OPTION_MODE_BOSS_RACE         (1ULL << 5)
 
-#define OPTION_TOKEN_COLOR       (1ULL << 12)
+#define OPTION_LAPS                   (1ULL << 6)
 
-#define OPTION_FREECAM           (1ULL << 13)
-#define OPTION_DEBUG_HUD         (1ULL << 14)
-#define OPTION_RESERVES          (1ULL << 15)
-#define OPTION_HOT_RELOAD        (1ULL << 16)
-#define OPTION_HOST_SETTINGS     (1ULL << 17)
-#define OPTION_MAX_STATS         (1ULL << 18)
+#define OPTION_RELIC_SAPPHIRE         (1ULL << 7)
+#define OPTION_RELIC_GOLD             (1ULL << 8)
+#define OPTION_RELIC_PLATINUM         (1ULL << 9)
 
-#define OPTION_MODE_ARCADE       (1ULL << 19)
-#define OPTION_MODE_RELIC_RACE   (1ULL << 20)
-#define OPTION_MODE_TIME_TRIAL   (1ULL << 21)
-#define OPTION_MODE_CRYSTAL_CHALLENGE (1ULL << 22)
-#define OPTION_MODE_CTR_TOKEN    (1ULL << 23)
-#define OPTION_MODE_BOSS_RACE    (1ULL << 24)
+#define OPTION_CRYSTAL_TIME           (1ULL << 10)
 
-#define OPTION_BOSS_1_ENABLED     (1ULL << 25)
-#define OPTION_BOSS_1_CHARACTER   (1ULL << 26)
-#define OPTION_BOSS_1_ITEM_PRESET (1ULL << 27)
+#define OPTION_TOKEN_COLOR            (1ULL << 11)
 
-#define OPTION_BOSS_2_ENABLED     (1ULL << 28)
-#define OPTION_BOSS_2_CHARACTER   (1ULL << 29)
-#define OPTION_BOSS_2_ITEM_PRESET (1ULL << 30)
+#define OPTION_GHOST                  (1ULL << 12)
+#define OPTION_GHOST_TIME_1           (1ULL << 13)
+#define OPTION_GHOST_CHARACTER_1      (1ULL << 14)
+#define OPTION_GHOST_TIME_2           (1ULL << 15)
+#define OPTION_GHOST_CHARACTER_2      (1ULL << 16)
 
-#define OPTION_BOSS_3_ENABLED     (1ULL << 31)
-#define OPTION_BOSS_3_CHARACTER   (1ULL << 32)
-#define OPTION_BOSS_3_ITEM_PRESET (1ULL << 33)
+#define OPTION_BOSS_1_ENABLED         (1ULL << 17)
+#define OPTION_BOSS_1_CHARACTER       (1ULL << 18)
+#define OPTION_BOSS_1_ITEM_PRESET     (1ULL << 19)
 
-#define OPTION_BOSS_4_ENABLED     (1ULL << 34)
-#define OPTION_BOSS_4_CHARACTER   (1ULL << 35)
-#define OPTION_BOSS_4_ITEM_PRESET (1ULL << 36)
+#define OPTION_BOSS_2_ENABLED         (1ULL << 20)
+#define OPTION_BOSS_2_CHARACTER       (1ULL << 21)
+#define OPTION_BOSS_2_ITEM_PRESET     (1ULL << 22)
 
-#define OPTION_BOSS_5_ENABLED     (1ULL << 37)
-#define OPTION_BOSS_5_CHARACTER   (1ULL << 38)
-#define OPTION_BOSS_5_ITEM_PRESET (1ULL << 39)
+#define OPTION_BOSS_3_ENABLED         (1ULL << 23)
+#define OPTION_BOSS_3_CHARACTER       (1ULL << 24)
+#define OPTION_BOSS_3_ITEM_PRESET     (1ULL << 25)
+
+#define OPTION_BOSS_4_ENABLED         (1ULL << 26)
+#define OPTION_BOSS_4_CHARACTER       (1ULL << 27)
+#define OPTION_BOSS_4_ITEM_PRESET     (1ULL << 28)
+
+#define OPTION_BOSS_5_ENABLED         (1ULL << 29)
+#define OPTION_BOSS_5_CHARACTER       (1ULL << 30)
+#define OPTION_BOSS_5_ITEM_PRESET     (1ULL << 31)
+
+#define OPTION_INTRO_CUTSCENE         (1ULL << 32)
+#define OPTION_HIGH_LOD               (1ULL << 33)
+
+#define OPTION_FREECAM                (1ULL << 34)
+#define OPTION_DEBUG_HUD              (1ULL << 35)
+#define OPTION_RESERVES               (1ULL << 36)
+#define OPTION_HOT_RELOAD             (1ULL << 37)
+#define OPTION_HOST_SETTINGS          (1ULL << 38)
+#define OPTION_MAX_STATS              (1ULL << 39)
 #define OPTION_ALL 0xFFFFFFFFFFULL
 
 typedef enum TokenColor

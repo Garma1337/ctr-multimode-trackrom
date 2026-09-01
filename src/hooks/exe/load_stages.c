@@ -438,10 +438,7 @@ static void ReservePrimAndOtMemory(struct GameTracker* gGT)
 
 static void OnStagedLevelLoaded(struct LoadQueueSlot* lqs)
 {
-	if (*CUSTOM_MAP_PTR_ADDR >= 0)
-	{
-		HotReload_ApplyStagedLevel();
-	}
+	HotReload_ApplyStagedLevel();
 
 	sdata->ptrLevelFile = (struct Level*)CUSTOM_LEV_ADDR;
 	sdata->load_inProgress = 0;

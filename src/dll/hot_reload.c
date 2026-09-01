@@ -1,6 +1,6 @@
+#include "../rom.h"
 #include "ghost.h"
 #include "hot_reload.h"
-#include "../rom.h"
 
 #include <common.h>
 
@@ -11,16 +11,28 @@ static int levelUnpacked = 0;
 
 static void HotReload_UploadVramChain(int* buffer)
 {
+	const int* limit = (const int*)(CUSTOM_VRAM_ADDR + VRM_FILESIZE);
+
 	int size = buffer[1];
 	struct VramHeader* header = (struct VramHeader*)&buffer[2];
 
 	while (size != 0)
 	{
+		if ((size < 0) || ((size & 3) != 0))
+		{
+			return;
+		}
+
+		int* next = &((int*)header)[size >> 2];
+
+		if ((next <= (int*)header) || ((next + 2) > limit))
+		{
+			return;
+		}
+
 		LoadImage(&header->rect, VRAMHEADER_GETPIXLES(header));
 
-		buffer = (int*)header;
-		buffer = &buffer[size >> 2];
-
+		buffer = next;
 		size = buffer[0];
 		header = (struct VramHeader*)&buffer[1];
 	}
@@ -39,15 +51,40 @@ void HotReload_UploadVram()
 	LoadImage(&((struct VramHeader*)buffer)->rect, VRAMHEADER_GETPIXLES((struct VramHeader*)buffer));
 }
 
+static int HotReload_IsPtrMapSane(int mapOffset)
+{
+	int levelBytes = CUSTOM_LEV_MAX_SIZE - (int)sizeof(int);
+
+	if ((mapOffset < 0) || ((mapOffset & 3) != 0) || (mapOffset > (levelBytes - (int)sizeof(int))))
+	{
+		return 0;
+	}
+
+	int mapSize = *(const int*)(CUSTOM_LEV_ADDR + mapOffset);
+
+	if ((mapSize < 0) || ((mapSize & 3) != 0))
+	{
+		return 0;
+	}
+
+	return mapSize <= (levelBytes - mapOffset - (int)sizeof(int));
+}
+
 void HotReload_ApplyStagedLevel()
 {
 	const char* level = CUSTOM_LEV_ADDR;
-	const int* mapOffset = CUSTOM_MAP_PTR_ADDR;
-	int* pointerMap = (int*)(level + *mapOffset);
-
-	LOAD_RunPtrMap(level, pointerMap + 1, *pointerMap >> 2);
+	int mapOffset = *CUSTOM_MAP_PTR_ADDR;
 
 	levelUnpacked = 0;
+
+	if (!HotReload_IsPtrMapSane(mapOffset))
+	{
+		return;
+	}
+
+	int* pointerMap = (int*)(level + mapOffset);
+
+	LOAD_RunPtrMap(level, pointerMap + 1, *pointerMap >> 2);
 }
 
 void HotReload_Poll()

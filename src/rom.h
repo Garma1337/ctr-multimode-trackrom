@@ -54,7 +54,7 @@ typedef enum HotReloadStep
 #define CD_SECTOR_SIZE      0x800
 
 #define PRIM_MEM_BASE           0x80600000
-#define CUSTOM_LEV_MAP_LOCATION 0x802F0800
+#define CUSTOM_LEV_MAP_LOCATION 0x80300000
 #define CUSTOM_LEV_LOCATION     (CUSTOM_LEV_MAP_LOCATION + sizeof(int))
 
 #define CUSTOM_LEV_MAX_SIZE     (PRIM_MEM_BASE - CUSTOM_LEV_MAP_LOCATION)
@@ -70,6 +70,7 @@ typedef enum HotReloadStep
 
 _Static_assert(DLL_LOCATION == 0x802C8A00, "DLL_LOCATION must match the DLL line in buildList.txt");
 _Static_assert(CUSTOM_LEV_MAP_LOCATION > DLL_LOCATION, "the custom LEV must sit above the DLL");
+_Static_assert(CUSTOM_LEV_MAP_LOCATION == 0x80300000, "CTE hardcodes the LEV staging address; update the editor before moving it");
 
 // sdata->mainGameState
 typedef enum MainState

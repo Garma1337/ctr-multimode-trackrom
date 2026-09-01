@@ -9,9 +9,9 @@ Everything the editor talks to lives in the low scratch page and in two staging 
 | `0x8000C008` | ghost ready flag         |
 | `0x8000C080` | `HostSettings` push      |
 | `0x80200000` | VRM staging buffer       |
-| `0x802F0800` | LEV staging buffer       |
+| `0x80300000` | LEV staging buffer       |
 
-The LEV buffer is `CUSTOM_LEV_MAP_LOCATION` in `src/rom.h`, and it moves when the memory map changes — read it from the header rather than hardcoding it. It begins with the 4-byte pointer-map offset, with the level data immediately after.
+The LEV buffer is `CUSTOM_LEV_MAP_LOCATION` in `src/rom.h`. CTE hardcodes it, so it is part of this contract and must not move without a matching editor change. It begins with the 4-byte pointer-map offset, with the level data immediately after.
 
 Both channels can be switched off in a shipped ROM: the **Hot Reload** and **Host Settings** feature flags stop the ROM polling for them. See [Customization](customization.md).
 

@@ -54,58 +54,91 @@
 
 typedef enum FieldKind
 {
-	FIELD_TIME = 0,
+	FIELD_TOGGLE = 0,
+	FIELD_TIME,
 	FIELD_LAPS,
-	FIELD_ENUM,
-	FIELD_TOGGLE
+	FIELD_ENUM
 } FieldKind;
 
-static const char* const fieldLabels[SETTINGS_BOSS_FIRST] = {
-	"Relic Time - Sapphire",
-	"Relic Time - Gold",
-	"Relic Time - Platinum",
+static const char* const fieldLabels[SETTINGS_FIELD_COUNT] = {
+	[SETTINGS_MODE_ARCADE] = "Mode - Arcade",
+	[SETTINGS_MODE_RELIC_RACE] = "Mode - Relic Race",
+	[SETTINGS_MODE_TIME_TRIAL] = "Mode - Time Trial",
+	[SETTINGS_MODE_CRYSTAL_CHALLENGE] = "Mode - Crystal Race",
+	[SETTINGS_MODE_CTR_TOKEN] = "Mode - CTR Token",
+	[SETTINGS_MODE_BOSS_RACE] = "Mode - Boss Race",
 
-	"Crystal Time Limit",
-	"Ghost Time 1",
-	"Ghost Time 2",
-	"Ghost Character 1",
-	"Ghost Character 2",
-	"Lap Count",
-	"Intro Cutscene",
-	"Time Trial Ghosts",
-	"High Detail Tracks",
-	"CTR Token Color",
+	[SETTINGS_LAPS] = "Lap Count",
 
-	"Freecam",
-	"Debug HUD",
-	"Reserves Display",
-	"Hot Reload",
-	"Host Settings",
-	"Updated Engine Stats",
+	[SETTINGS_RELIC_SAPPHIRE] = "Relic Time - Sapphire",
+	[SETTINGS_RELIC_GOLD] = "Relic Time - Gold",
+	[SETTINGS_RELIC_PLATINUM] = "Relic Time - Platinum",
 
-	"Mode - Arcade",
-	"Mode - Relic Race",
-	"Mode - Time Trial",
-	"Mode - Crystal Race",
-	"Mode - CTR Token",
-	"Mode - Boss Race",
+	[SETTINGS_CRYSTAL_TIME] = "Crystal Time Limit",
 
+	[SETTINGS_CTR_TOKEN] = "CTR Token Color",
+
+	[SETTINGS_GHOST] = "Time Trial Ghosts",
+	[SETTINGS_GHOST_TIME_1] = "Ghost 1 Time",
+	[SETTINGS_GHOST_CHARACTER_1] = "Ghost 1 Character",
+	[SETTINGS_GHOST_TIME_2] = "Ghost 2 Time",
+	[SETTINGS_GHOST_CHARACTER_2] = "Ghost 2 Character",
+
+	[SETTINGS_BOSS_1_ENABLED] = "Boss 1 Enabled",
+	[SETTINGS_BOSS_1_CHARACTER] = "Boss 1 Character",
+	[SETTINGS_BOSS_1_ITEM_PRESET] = "Boss 1 Item Preset",
+
+	[SETTINGS_BOSS_2_ENABLED] = "Boss 2 Enabled",
+	[SETTINGS_BOSS_2_CHARACTER] = "Boss 2 Character",
+	[SETTINGS_BOSS_2_ITEM_PRESET] = "Boss 2 Item Preset",
+
+	[SETTINGS_BOSS_3_ENABLED] = "Boss 3 Enabled",
+	[SETTINGS_BOSS_3_CHARACTER] = "Boss 3 Character",
+	[SETTINGS_BOSS_3_ITEM_PRESET] = "Boss 3 Item Preset",
+
+	[SETTINGS_BOSS_4_ENABLED] = "Boss 4 Enabled",
+	[SETTINGS_BOSS_4_CHARACTER] = "Boss 4 Character",
+	[SETTINGS_BOSS_4_ITEM_PRESET] = "Boss 4 Item Preset",
+
+	[SETTINGS_BOSS_5_ENABLED] = "Boss 5 Enabled",
+	[SETTINGS_BOSS_5_CHARACTER] = "Boss 5 Character",
+	[SETTINGS_BOSS_5_ITEM_PRESET] = "Boss 5 Item Preset",
+
+	[SETTINGS_INTRO_CUTSCENE] = "Intro Cutscene",
+	[SETTINGS_HIGH_LOD] = "High Detail Tracks",
+
+	[SETTINGS_FREECAM] = "Freecam",
+	[SETTINGS_DEBUG_HUD] = "Debug HUD",
+	[SETTINGS_RESERVES] = "Reserves Display",
+	[SETTINGS_HOT_RELOAD] = "Hot Reload",
+	[SETTINGS_HOST_SETTINGS] = "Host Settings",
+	[SETTINGS_MAX_STATS] = "Updated Engine Stats",
 };
 
-static const unsigned char fieldKinds[SETTINGS_FEATURE_FIRST] = {
-	FIELD_TIME,
-	FIELD_TIME,
-	FIELD_TIME,
-	FIELD_TIME,
-	FIELD_TIME,
-	FIELD_TIME,
-	FIELD_ENUM,
-	FIELD_ENUM,
-	FIELD_LAPS,
-	FIELD_TOGGLE,
-	FIELD_TOGGLE,
-	FIELD_TOGGLE,
-	FIELD_ENUM,
+static const unsigned char fieldKinds[SETTINGS_FIELD_COUNT] = {
+	[SETTINGS_LAPS] = FIELD_LAPS,
+
+	[SETTINGS_RELIC_SAPPHIRE] = FIELD_TIME,
+	[SETTINGS_RELIC_GOLD] = FIELD_TIME,
+	[SETTINGS_RELIC_PLATINUM] = FIELD_TIME,
+	[SETTINGS_CRYSTAL_TIME] = FIELD_TIME,
+	[SETTINGS_GHOST_TIME_1] = FIELD_TIME,
+	[SETTINGS_GHOST_TIME_2] = FIELD_TIME,
+
+	[SETTINGS_CTR_TOKEN] = FIELD_ENUM,
+	[SETTINGS_GHOST_CHARACTER_1] = FIELD_ENUM,
+	[SETTINGS_GHOST_CHARACTER_2] = FIELD_ENUM,
+
+	[SETTINGS_BOSS_1_CHARACTER] = FIELD_ENUM,
+	[SETTINGS_BOSS_1_ITEM_PRESET] = FIELD_ENUM,
+	[SETTINGS_BOSS_2_CHARACTER] = FIELD_ENUM,
+	[SETTINGS_BOSS_2_ITEM_PRESET] = FIELD_ENUM,
+	[SETTINGS_BOSS_3_CHARACTER] = FIELD_ENUM,
+	[SETTINGS_BOSS_3_ITEM_PRESET] = FIELD_ENUM,
+	[SETTINGS_BOSS_4_CHARACTER] = FIELD_ENUM,
+	[SETTINGS_BOSS_4_ITEM_PRESET] = FIELD_ENUM,
+	[SETTINGS_BOSS_5_CHARACTER] = FIELD_ENUM,
+	[SETTINGS_BOSS_5_ITEM_PRESET] = FIELD_ENUM,
 };
 
 static const char* const tokenNames[TOKEN_COLOR_COUNT] = {
@@ -133,28 +166,6 @@ static const char* const characterNames[GHOST_CHARACTER_COUNT] = {
 	"Penta",
 	"Fake Crash",
 	"N. Oxide",
-};
-
-static const char* const bossRowLabel[SETTINGS_BOSS_END - SETTINGS_BOSS_FIRST] = {
-	"Boss 1 Enabled",
-	"Boss 1 Character",
-	"Boss 1 Item Preset",
-
-	"Boss 2 Enabled",
-	"Boss 2 Character",
-	"Boss 2 Item Preset",
-
-	"Boss 3 Enabled",
-	"Boss 3 Character",
-	"Boss 3 Item Preset",
-
-	"Boss 4 Enabled",
-	"Boss 4 Character",
-	"Boss 4 Item Preset",
-
-	"Boss 5 Enabled",
-	"Boss 5 Character",
-	"Boss 5 Item Preset",
 };
 
 static const char* const* fieldOptions[SETTINGS_FIELD_COUNT] = {
@@ -186,17 +197,12 @@ static int hostSeen = 0;
 
 static const char* Settings_GetLabel(int field)
 {
-	if (field < SETTINGS_BOSS_FIRST)
-	{
-		return fieldLabels[field];
-	}
-
-	return bossRowLabel[field - SETTINGS_BOSS_FIRST];
+	return fieldLabels[field];
 }
 
 static int Settings_GetBossRow(int field)
 {
-	if (field < SETTINGS_BOSS_FIRST)
+	if ((field < SETTINGS_BOSS_FIRST) || (field >= SETTINGS_BOSS_END))
 	{
 		return -1;
 	}
@@ -232,22 +238,9 @@ static int Settings_GetOptionCount(int field)
 	return fieldOptionCount[field];
 }
 
-
 static int Settings_GetKind(int field)
 {
-	if (field < SETTINGS_FEATURE_FIRST)
-	{
-		return fieldKinds[field];
-	}
-
-	switch (Settings_GetBossRow(field))
-	{
-	case SETTINGS_BOSS_ROW_CHARACTER:
-	case SETTINGS_BOSS_ROW_ITEM_PRESET:
-		return FIELD_ENUM;
-	}
-
-	return FIELD_TOGGLE;
+	return fieldKinds[field];
 }
 
 static int Settings_GetCursorField(void)

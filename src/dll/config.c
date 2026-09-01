@@ -1,10 +1,10 @@
+#include "../config/config_default.h"
+#include "../rom.h"
 #include "boss.h"
 #include "config.h"
-#include "../config/config_default.h"
 #include "game_mode.h"
 #include "ghost.h"
 #include "main_menu.h"
-#include "../rom.h"
 #include "settings.h"
 
 #include <common.h>
@@ -16,21 +16,46 @@ _Static_assert(CONFIG_MODE_CRYSTAL_CHALLENGE == (1 << MODE_CRYSTAL_CHALLENGE), "
 _Static_assert(CONFIG_MODE_CTR_TOKEN == (1 << MODE_CTR_TOKEN), "mode bits drifted");
 _Static_assert(CONFIG_MODE_BOSS_RACE == (1 << MODE_BOSS_RACE), "mode bits drifted");
 
+_Static_assert(OPTION_MODE_ARCADE == (1ULL << SETTINGS_MODE_ARCADE), "setting option bits drifted");
+_Static_assert(OPTION_MODE_RELIC_RACE == (1ULL << SETTINGS_MODE_RELIC_RACE), "setting option bits drifted");
+_Static_assert(OPTION_MODE_TIME_TRIAL == (1ULL << SETTINGS_MODE_TIME_TRIAL), "setting option bits drifted");
+_Static_assert(OPTION_MODE_CRYSTAL_CHALLENGE == (1ULL << SETTINGS_MODE_CRYSTAL_CHALLENGE), "setting option bits drifted");
+_Static_assert(OPTION_MODE_CTR_TOKEN == (1ULL << SETTINGS_MODE_CTR_TOKEN), "setting option bits drifted");
+_Static_assert(OPTION_MODE_BOSS_RACE == (1ULL << SETTINGS_MODE_BOSS_RACE), "setting option bits drifted");
+_Static_assert(OPTION_LAPS == (1ULL << SETTINGS_LAPS), "setting option bits drifted");
 _Static_assert(OPTION_RELIC_SAPPHIRE == (1ULL << SETTINGS_RELIC_SAPPHIRE), "setting option bits drifted");
+_Static_assert(OPTION_RELIC_GOLD == (1ULL << SETTINGS_RELIC_GOLD), "setting option bits drifted");
+_Static_assert(OPTION_RELIC_PLATINUM == (1ULL << SETTINGS_RELIC_PLATINUM), "setting option bits drifted");
+_Static_assert(OPTION_CRYSTAL_TIME == (1ULL << SETTINGS_CRYSTAL_TIME), "setting option bits drifted");
+_Static_assert(OPTION_TOKEN_COLOR == (1ULL << SETTINGS_CTR_TOKEN), "setting option bits drifted");
+_Static_assert(OPTION_GHOST == (1ULL << SETTINGS_GHOST), "setting option bits drifted");
 _Static_assert(OPTION_GHOST_TIME_1 == (1ULL << SETTINGS_GHOST_TIME_1), "setting option bits drifted");
 _Static_assert(OPTION_GHOST_CHARACTER_1 == (1ULL << SETTINGS_GHOST_CHARACTER_1), "setting option bits drifted");
+_Static_assert(OPTION_GHOST_TIME_2 == (1ULL << SETTINGS_GHOST_TIME_2), "setting option bits drifted");
 _Static_assert(OPTION_GHOST_CHARACTER_2 == (1ULL << SETTINGS_GHOST_CHARACTER_2), "setting option bits drifted");
-_Static_assert(OPTION_LAPS == (1ULL << SETTINGS_LAPS), "setting option bits drifted");
-_Static_assert(OPTION_TOKEN_COLOR == (1ULL << SETTINGS_CTR_TOKEN), "setting option bits drifted");
-_Static_assert(OPTION_MAX_STATS == (1ULL << SETTINGS_MAX_STATS), "setting option bits drifted");
-_Static_assert(OPTION_GHOST == (1ULL << SETTINGS_GHOST), "setting option bits drifted");
-_Static_assert(OPTION_HIGH_LOD == (1ULL << SETTINGS_HIGH_LOD), "setting option bits drifted");
-_Static_assert(OPTION_FREECAM == (1ULL << SETTINGS_FREECAM), "setting option bits drifted");
-_Static_assert(OPTION_MODE_ARCADE == (1ULL << SETTINGS_MODE_ARCADE), "setting option bits drifted");
 _Static_assert(OPTION_BOSS_1_ENABLED == (1ULL << SETTINGS_BOSS_1_ENABLED), "setting option bits drifted");
 _Static_assert(OPTION_BOSS_1_CHARACTER == (1ULL << SETTINGS_BOSS_1_CHARACTER), "setting option bits drifted");
 _Static_assert(OPTION_BOSS_1_ITEM_PRESET == (1ULL << SETTINGS_BOSS_1_ITEM_PRESET), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_2_ENABLED == (1ULL << SETTINGS_BOSS_2_ENABLED), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_2_CHARACTER == (1ULL << SETTINGS_BOSS_2_CHARACTER), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_2_ITEM_PRESET == (1ULL << SETTINGS_BOSS_2_ITEM_PRESET), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_3_ENABLED == (1ULL << SETTINGS_BOSS_3_ENABLED), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_3_CHARACTER == (1ULL << SETTINGS_BOSS_3_CHARACTER), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_3_ITEM_PRESET == (1ULL << SETTINGS_BOSS_3_ITEM_PRESET), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_4_ENABLED == (1ULL << SETTINGS_BOSS_4_ENABLED), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_4_CHARACTER == (1ULL << SETTINGS_BOSS_4_CHARACTER), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_4_ITEM_PRESET == (1ULL << SETTINGS_BOSS_4_ITEM_PRESET), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_5_ENABLED == (1ULL << SETTINGS_BOSS_5_ENABLED), "setting option bits drifted");
+_Static_assert(OPTION_BOSS_5_CHARACTER == (1ULL << SETTINGS_BOSS_5_CHARACTER), "setting option bits drifted");
 _Static_assert(OPTION_BOSS_5_ITEM_PRESET == (1ULL << SETTINGS_BOSS_5_ITEM_PRESET), "setting option bits drifted");
+_Static_assert(OPTION_INTRO_CUTSCENE == (1ULL << SETTINGS_INTRO_CUTSCENE), "setting option bits drifted");
+_Static_assert(OPTION_HIGH_LOD == (1ULL << SETTINGS_HIGH_LOD), "setting option bits drifted");
+_Static_assert(OPTION_FREECAM == (1ULL << SETTINGS_FREECAM), "setting option bits drifted");
+_Static_assert(OPTION_DEBUG_HUD == (1ULL << SETTINGS_DEBUG_HUD), "setting option bits drifted");
+_Static_assert(OPTION_RESERVES == (1ULL << SETTINGS_RESERVES), "setting option bits drifted");
+_Static_assert(OPTION_HOT_RELOAD == (1ULL << SETTINGS_HOT_RELOAD), "setting option bits drifted");
+_Static_assert(OPTION_HOST_SETTINGS == (1ULL << SETTINGS_HOST_SETTINGS), "setting option bits drifted");
+_Static_assert(OPTION_MAX_STATS == (1ULL << SETTINGS_MAX_STATS), "setting option bits drifted");
 _Static_assert(OPTION_ALL == ((1ULL << SETTINGS_FIELD_COUNT) - 1), "option mask does not cover every field");
 _Static_assert(CONFIG_BOSS_COUNT == BOSS_COUNT, "boss count drifted");
 
@@ -138,8 +163,8 @@ void Config_Set(const Config* next)
 int Config_IsValid(const Config* candidate)
 {
 	return (candidate->magic == CONFIG_MAGIC) &&
-	       (candidate->version <= CONFIG_VERSION) &&
-	       (candidate->size >= CONFIG_MIN_SIZE);
+		(candidate->version <= CONFIG_VERSION) &&
+		(candidate->size >= CONFIG_MIN_SIZE);
 }
 
 const Config* Config_Get()
