@@ -16,6 +16,13 @@
 // #define CFG_LAPS     5 // 5 lap races
 // #define CFG_CTR_TOKEN TOKEN_RED // Set CTR token color to Red
 
+// === Detail ===
+
+// #define CFG_HIGH_LOD_TRACKS     0 // Let track geometry drop detail with distance, as vanilla does
+// #define CFG_HIGH_LOD_CHARACTERS 0 // Let the AI karts drop detail with distance, as vanilla does
+
+// === Relic times ===
+
 // #define CFG_RELIC_SAPPHIRE 90000 // 1:30.00 for Sapphire
 // #define CFG_RELIC_GOLD     80000 // 1:20.00 for Gold
 // #define CFG_RELIC_PLATINUM 70000 // 1:10.00 for Platinum

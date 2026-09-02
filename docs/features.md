@@ -8,7 +8,7 @@ Press `L3` + `R3` during a race. Every kart is halted and all quadblocks are for
 
 Because the visibility tree is bypassed, what you see in freecam is not what the renderer would normally draw — use the debug HUD's `QUADS` row for that, not freecam.
 
-Note that **High Detail Tracks** also changes what is drawn: with it on, every quadblock renders at full detail regardless of distance. Turn it off in the settings when you want realistic numbers.
+Note that **High Detail Tracks** and **High Detail Characters** also change what is drawn: with them on, every quadblock renders at full detail regardless of distance and the AI karts hold their closest mesh across most of the visible range. Turn them off in the settings when you want realistic numbers.
 
 Toggling it off restores the karts and the normal camera. Freecam only becomes available once the race intro fly-in is over.
 

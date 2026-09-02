@@ -49,7 +49,8 @@ _Static_assert(OPTION_BOSS_5_ENABLED == (1ULL << SETTINGS_BOSS_5_ENABLED), "sett
 _Static_assert(OPTION_BOSS_5_CHARACTER == (1ULL << SETTINGS_BOSS_5_CHARACTER), "setting option bits drifted");
 _Static_assert(OPTION_BOSS_5_ITEM_PRESET == (1ULL << SETTINGS_BOSS_5_ITEM_PRESET), "setting option bits drifted");
 _Static_assert(OPTION_INTRO_CUTSCENE == (1ULL << SETTINGS_INTRO_CUTSCENE), "setting option bits drifted");
-_Static_assert(OPTION_HIGH_LOD == (1ULL << SETTINGS_HIGH_LOD), "setting option bits drifted");
+_Static_assert(OPTION_HIGH_LOD_TRACKS == (1ULL << SETTINGS_HIGH_LOD_TRACKS), "setting option bits drifted");
+_Static_assert(OPTION_HIGH_LOD_CHARACTERS == (1ULL << SETTINGS_HIGH_LOD_CHARACTERS), "setting option bits drifted");
 _Static_assert(OPTION_FREECAM == (1ULL << SETTINGS_FREECAM), "setting option bits drifted");
 _Static_assert(OPTION_DEBUG_HUD == (1ULL << SETTINGS_DEBUG_HUD), "setting option bits drifted");
 _Static_assert(OPTION_RESERVES == (1ULL << SETTINGS_RESERVES), "setting option bits drifted");

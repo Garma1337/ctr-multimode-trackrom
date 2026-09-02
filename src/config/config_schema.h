@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 #define CONFIG_MAGIC 0x4746434D // 'MCFG'
-#define CONFIG_VERSION 3
+#define CONFIG_VERSION 4
 #define CONFIG_LAPS_MIN 1
 #define CONFIG_LAPS_MAX 7
 #define CONFIG_MIN_SIZE 8
@@ -86,15 +86,16 @@ typedef enum ModeFlag
 #define OPTION_BOSS_5_ITEM_PRESET     (1ULL << 31)
 
 #define OPTION_INTRO_CUTSCENE         (1ULL << 32)
-#define OPTION_HIGH_LOD               (1ULL << 33)
+#define OPTION_HIGH_LOD_TRACKS        (1ULL << 33)
+#define OPTION_HIGH_LOD_CHARACTERS    (1ULL << 34)
 
-#define OPTION_FREECAM                (1ULL << 34)
-#define OPTION_DEBUG_HUD              (1ULL << 35)
-#define OPTION_RESERVES               (1ULL << 36)
-#define OPTION_HOT_RELOAD             (1ULL << 37)
-#define OPTION_HOST_SETTINGS          (1ULL << 38)
-#define OPTION_MAX_STATS              (1ULL << 39)
-#define OPTION_ALL 0xFFFFFFFFFFULL
+#define OPTION_FREECAM                (1ULL << 35)
+#define OPTION_DEBUG_HUD              (1ULL << 36)
+#define OPTION_RESERVES               (1ULL << 37)
+#define OPTION_HOT_RELOAD             (1ULL << 38)
+#define OPTION_HOST_SETTINGS          (1ULL << 39)
+#define OPTION_MAX_STATS              (1ULL << 40)
+#define OPTION_ALL 0x1FFFFFFFFFFULL
 
 typedef enum TokenColor
 {
@@ -162,7 +163,8 @@ typedef struct Config
 	unsigned char laps;
 	unsigned char introCutscene;
 	unsigned char ghosts;
-	unsigned char highLod;
+	unsigned char highLodTracks;
+	unsigned char highLodCharacters;
 	unsigned char bosses;
 	unsigned char ctrToken; // TokenColor
 	unsigned char ghostCharacter[GHOST_SLOT_COUNT];

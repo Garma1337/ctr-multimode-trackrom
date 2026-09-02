@@ -105,7 +105,8 @@ static const char* const fieldLabels[SETTINGS_FIELD_COUNT] = {
 	[SETTINGS_BOSS_5_ITEM_PRESET] = "Boss 5 Item Preset",
 
 	[SETTINGS_INTRO_CUTSCENE] = "Intro Cutscene",
-	[SETTINGS_HIGH_LOD] = "High Detail Tracks",
+	[SETTINGS_HIGH_LOD_TRACKS] = "High Detail Tracks",
+	[SETTINGS_HIGH_LOD_CHARACTERS] = "High Detail Characters",
 
 	[SETTINGS_FREECAM] = "Freecam",
 	[SETTINGS_DEBUG_HUD] = "Debug HUD",
@@ -320,7 +321,8 @@ static void Settings_LoadDraft(void)
 	draft[SETTINGS_LAPS] = config->laps;
 	draft[SETTINGS_INTRO_CUTSCENE] = (config->introCutscene != 0);
 	draft[SETTINGS_GHOST] = (config->ghosts != 0);
-	draft[SETTINGS_HIGH_LOD] = (config->highLod != 0);
+	draft[SETTINGS_HIGH_LOD_TRACKS] = (config->highLodTracks != 0);
+	draft[SETTINGS_HIGH_LOD_CHARACTERS] = (config->highLodCharacters != 0);
 	draft[SETTINGS_CTR_TOKEN] = config->ctrToken;
 
 	for (int boss = 0; boss < CONFIG_BOSS_COUNT; boss++)
@@ -351,7 +353,8 @@ static void Settings_Commit(void)
 	next.laps = (unsigned char)draft[SETTINGS_LAPS];
 	next.introCutscene = (unsigned char)draft[SETTINGS_INTRO_CUTSCENE];
 	next.ghosts = (unsigned char)draft[SETTINGS_GHOST];
-	next.highLod = (unsigned char)draft[SETTINGS_HIGH_LOD];
+	next.highLodTracks = (unsigned char)draft[SETTINGS_HIGH_LOD_TRACKS];
+	next.highLodCharacters = (unsigned char)draft[SETTINGS_HIGH_LOD_CHARACTERS];
 	next.ctrToken = (unsigned char)draft[SETTINGS_CTR_TOKEN];
 
 	next.bosses = 0;

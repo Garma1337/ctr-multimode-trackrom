@@ -184,13 +184,15 @@ Where along the track the boss throws is not configurable and does not need to b
 
 ### Presentation
 
-| Field              | Range    | Default |
-|--------------------|----------|---------|
-| Intro Cutscene     | On / Off | On      |
-| High Detail Tracks | On / Off | On      |
+| Field                  | Range    | Default |
+|------------------------|----------|---------|
+| Intro Cutscene         | On / Off | On      |
+| High Detail Tracks     | On / Off | On      |
+| High Detail Characters | On / Off | On      |
 
 * **Intro Cutscene** off skips the race intro camera fly-in, which saves a few seconds on every retry. Like the ghost toggle it is applied by patching an instruction, so it takes effect on the next race.
 * **High Detail Tracks** pins every quadblock to its highest detail level instead of letting the renderer drop detail with distance. On is what you want while authoring — it is how the track was designed to look. Turn it off to see what the engine would normally draw and what that costs; the `QUADS` and `FRAME` rows of the [debug HUD](./features.md#debug-hud) are the ones to watch. It re-applies at the start of each race, so a change takes effect on the next load.
+* **High Detail Characters** does the same for the AI racers. Their karts ship four meshes each and the engine steps down through them with distance; on, the closest mesh is held for most of the visible range instead. Your own kart is unaffected — player models ship a single mesh and are always at full detail — so this changes how the pack around you looks, not how you look. It also re-applies per race.
 
 ### Features
 

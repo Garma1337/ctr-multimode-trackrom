@@ -66,8 +66,12 @@
 #define CFG_GHOSTS 1
 #endif
 
-#ifndef CFG_HIGH_LOD
-#define CFG_HIGH_LOD 1
+#ifndef CFG_HIGH_LOD_TRACKS
+#define CFG_HIGH_LOD_TRACKS 1
+#endif
+
+#ifndef CFG_HIGH_LOD_CHARACTERS
+#define CFG_HIGH_LOD_CHARACTERS 1
 #endif
 
 #ifndef CFG_CTR_TOKEN
@@ -130,7 +134,8 @@
 	.laps = CFG_LAPS, \
 	.introCutscene = CFG_INTRO_CUTSCENE, \
 	.ghosts = CFG_GHOSTS, \
-	.highLod = CFG_HIGH_LOD, \
+	.highLodTracks = CFG_HIGH_LOD_TRACKS, \
+	.highLodCharacters = CFG_HIGH_LOD_CHARACTERS, \
 	.bosses = CFG_BOSSES, \
 	.ctrToken = CFG_CTR_TOKEN, \
 	.ghostCharacter = { CFG_GHOST_CHARACTER_1, CFG_GHOST_CHARACTER_2 }, \
