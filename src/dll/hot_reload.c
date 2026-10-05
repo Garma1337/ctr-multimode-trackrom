@@ -25,7 +25,7 @@ static void HotReload_UploadVramChain(int* buffer)
 
 		int* next = &((int*)header)[size >> 2];
 
-		if ((next <= (int*)header) || ((next + 2) > limit))
+		if ((next <= (int*)header) || ((next + 1) > limit))
 		{
 			return;
 		}
